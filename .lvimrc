@@ -1,0 +1,7 @@
+set wildignore+=*/build/*
+set path+=src
+
+let c_no_curly_error=1
+
+nnoremap <leader>r :w<cr>:!(cd build && make -j4 && ./rts)<cr>
+nnoremap <leader>b :w<cr>:!(cd build && make -j4)<cr>

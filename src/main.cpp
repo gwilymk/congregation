@@ -1,8 +1,7 @@
-#include <SFML/Window.hpp>
+#include "rts/application.hpp"
 
 int main(int argc, char *argv[])
 {
-    sf::Window screen(sf::VideoMode(800, 600), "rts");
-
-    screen.display();
+    rts::Application app;
+    return app.run();
 }
