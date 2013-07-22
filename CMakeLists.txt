@@ -9,6 +9,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 endif()
 
+set(SFML_STATIC_LIBRARIES FALSE CACHE BOOL "Use static SFML librares")
+
 set(EXECUTABLE_NAME "rts")
 add_executable(${EXECUTABLE_NAME} 
     src/main.cpp
@@ -27,7 +29,7 @@ add_executable(${EXECUTABLE_NAME}
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
-find_package(SFML 2 COMPONENTS window graphics network audio system REQUIRED)
+find_package(SFML 2 COMPONENTS audio graphics window network system REQUIRED)
 find_package(Lua51 REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(${SFML_INCULDE_DIR} ${LUA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src)
