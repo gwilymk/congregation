@@ -84,7 +84,7 @@ namespace rts
             static int function_list___gc(lua_State *L)
             {
                 function_list *list = (function_list *) lua_touserdata(L, -1);
-                delete list;
+                list->~map();
                 return 0;
             }
 
@@ -103,7 +103,7 @@ namespace rts
                 auto ret = list->insert(std::make_pair(list->size(), val));
                 assert(ret.second);
 
-                lua_pushlightuserdata(L, &(*ret.first));
+                lua_pushlightuserdata(L, &(ret.first->second));
                 lua_pushcclosure(L, &lua_function_call, 1);
             }
 
