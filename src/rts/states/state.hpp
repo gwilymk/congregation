@@ -17,8 +17,6 @@ namespace rts
 {
     class StateStack;
 
-    namespace lua { class State; }
-
     namespace states
     {
         class State : private sf::NonCopyable
@@ -27,10 +25,9 @@ namespace rts
                 typedef std::unique_ptr<State> ptr;
 
                 struct Context {
-                    Context(sf::RenderWindow &window, lua::State &L);
+                    Context(sf::RenderWindow &window);
 
                     sf::RenderWindow *window;
-                    lua::State *L;
                 };
 
             public:

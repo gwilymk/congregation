@@ -16,6 +16,8 @@ namespace rts
             int run();
 
         private:
+            void init();
+
             void process_input();
             void update(sf::Time dt);
             void draw();

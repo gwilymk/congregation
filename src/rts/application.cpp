@@ -15,7 +15,7 @@ namespace rts
     Application::Application():
         m_render_window(sf::VideoMode(800, 600), "rts"),
         m_lua_state(),
-        m_state_stack(states::State::Context(m_render_window, m_lua_state))
+        m_state_stack(states::State::Context(m_render_window))
     {
         m_render_window.setVerticalSyncEnabled(true);
         register_states();
@@ -23,6 +23,8 @@ namespace rts
 
     int Application::run()
     {
+        init();
+
         sf::Clock clock;
         sf::Time time_since_last_update = sf::Time::Zero;
 
@@ -50,6 +52,10 @@ namespace rts
         }
 
         return 0;
+    }
+
+    void Application::init()
+    {
     }
 
     void Application::update(sf::Time dt)
