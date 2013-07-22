@@ -10,13 +10,14 @@ load_resource = (filename) ->
         error 1
 
     export resource = (tbl) ->
-        if tbl.type == "font"
-            load_font tbl.name, "../res/" .. tbl.filename
-        elseif tbl.type == "texture"
-            load_texture tbl.name, "../res/" .. tbl.filename
-        else
-            print "Error, unknown type #{tbl.type}"
-            error 1
+        switch tbl.type
+            when "font"
+                load_font tbl.name, "../res/" .. tbl.filename
+            when "texture"
+                load_texture tbl.name, "../res/" .. tbl.filename
+            else
+                print "Error, unknown type #{tbl.type}"
+                error 1
 
     data()
 
