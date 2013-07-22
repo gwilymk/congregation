@@ -9,15 +9,23 @@ namespace rts
 {
     namespace lua
     {
-        State::State()
+        State::State():
+            m_should_cleanup(true)
         {
             L = luaL_newstate();
             luaL_openlibs(L);
         }
 
+        State::State(lua_State *L):
+            L(L),
+            m_should_cleanup(false)
+        {
+        }
+
         State::~State()
         {
-            lua_close(L);
+            if(m_should_cleanup)
+                lua_close(L);
         }
 
         int State::get_top()
@@ -107,7 +115,7 @@ namespace rts
         {
             int top = get_top();
 
-            std::printf("L U A   S T A C K   D U M P");
+            std::printf("L U A   S T A C K   D U M P\n");
             std::printf("===========================\n\n");
 
             for(int i = 1; i <= top; ++i) {
@@ -124,7 +132,7 @@ namespace rts
                         std::printf("%i - %g\n", i, get<double>(i));
                         break;
                     default:
-                        std::printf("%i - %s\n", i, type_name(i));
+                        std::printf("%i - %s\n", i, type_name(t));
                         break;
                 }
             }

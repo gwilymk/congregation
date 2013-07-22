@@ -14,6 +14,7 @@ namespace rts
         {
             public:
                 State();
+                State(lua_State *L);
                 ~State();
 
                 template <typename T> void push(const T &val);
@@ -44,7 +45,9 @@ namespace rts
                 void call_intern(int nresults, int nargs);
                 template <typename T, typename... Args> void call_intern(int nresults, int nargs, T value, Args... args);
 
+            private:
                 lua_State *L;
+                bool m_should_cleanup;
         };
     }
 }
