@@ -1,4 +1,5 @@
 set wildignore+=*/build/*
+set wildignore+=*.lua
 set path+=src
 
 let c_no_curly_error=1

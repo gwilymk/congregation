@@ -1,5 +1,29 @@
-print("Hello, World")
+print "Loading resources"
 
-print("Closing window")
+import load_texture, load_font from rts
 
-f();
+load_resource = (filename) ->
+    data = loadfile("../res/" .. filename)
+    
+    unless data
+        print "Failed to load file " .. filename
+        error 1
+
+    export resource = (tbl) ->
+        if tbl.type == "font"
+            load_font tbl.name, "../res/" .. tbl.filename
+        elseif tbl.type == "texture"
+            load_texture tbl.name, "../res/" .. tbl.filename
+        else
+            print "Error, unknown type #{tbl.type}"
+            error 1
+
+    data()
+
+resource_files = {
+    "textures/title.lua"
+    "fonts/font.lua",
+}
+
+for res in *resource_files
+    load_resource(res)

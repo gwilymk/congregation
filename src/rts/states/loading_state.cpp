@@ -1,5 +1,6 @@
 #include "loading_state.hpp"
 #include "rts/state_stack.hpp"
+#include "rts/states/id.hpp"
 
 namespace rts 
 {
@@ -40,6 +41,9 @@ namespace rts
 
         bool LoadingState::update(sf::Time dt)
         {
+            m_lua_state.run_file("../res/init.lua");
+            request_stack_pop();
+            request_stack_push(ID::TitleState);
             return true;
         }
 

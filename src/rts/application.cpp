@@ -40,7 +40,7 @@ namespace rts
 
             int skips = 0;
 
-            while(time_since_last_update > TIME_PER_FRAME && skips >= MAX_FRAME_SKIPS) {
+            while(time_since_last_update > TIME_PER_FRAME && skips <= MAX_FRAME_SKIPS) {
                 time_since_last_update -= TIME_PER_FRAME;
                 process_input();
                 update(TIME_PER_FRAME);
