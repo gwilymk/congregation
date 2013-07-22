@@ -10,12 +10,9 @@ namespace rts
     }
 
     Application::Application():
-        m_render_window(
-            sf::VideoMode(800, 600), "rts"      
-        ),
-        m_state_stack(
-            states::State::Context(m_render_window)
-        )
+        m_render_window(sf::VideoMode(800, 600), "rts"),
+        m_lua_state(),
+        m_state_stack(states::State::Context(m_render_window, m_lua_state))
     {
         m_render_window.setVerticalSyncEnabled(true);
         register_states();

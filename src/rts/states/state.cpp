@@ -4,8 +4,9 @@ namespace rts
 {
     namespace states
     {
-        State::Context::Context(sf::RenderWindow &window):
-            window(&window)
+        State::Context::Context(sf::RenderWindow &window, lua::State &L):
+            window(&window),
+            L(&L)
         {
         }
     }
