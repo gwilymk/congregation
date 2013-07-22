@@ -2,6 +2,7 @@
 #define MAIN_MENU_HPP
 
 #include "rts/states/state.hpp"
+#include "rts/gui/container.hpp"
 
 namespace rts
 {
@@ -15,6 +16,9 @@ namespace rts
                 virtual void draw();
                 virtual bool update(sf::Time dt);
                 virtual bool handle_event(const sf::Event &event);
+
+            private:
+                gui::Container m_container;
         };
     }
 }

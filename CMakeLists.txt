@@ -14,6 +14,10 @@ add_executable(${EXECUTABLE_NAME}
     src/main.cpp
     src/rts/application.cpp
     src/rts/common.cpp
+    src/rts/gui/button.cpp
+    src/rts/gui/container.cpp
+    src/rts/gui/element.cpp
+    src/rts/gui/label.cpp
     src/rts/lua/state.cpp
     src/rts/states/loading_state.cpp
     src/rts/states/main_menu.cpp
