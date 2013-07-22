@@ -32,6 +32,8 @@ namespace rts
             void pop_state();
             void clear_states();
 
+            bool is_empty();
+
         private:
             states::State::ptr create_state(states::ID stateID);
             void apply_pending_changes();

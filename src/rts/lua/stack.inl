@@ -4,6 +4,10 @@
 
 #include <lua.hpp>
 #include <string>
+#include <map>
+#include <functional>
+
+#include "rts/common.hpp"
 
 namespace rts
 {
@@ -63,6 +67,47 @@ namespace rts
             {
                 return lua_toboolean(L, n);
             }
+        };
+
+        template <>
+        struct Stack<std::function<int(lua_State *)>>
+        {
+            typedef std::function<int(lua_State *)> lua_function;
+            typedef std::map<int, lua_function> function_list;
+
+            static int lua_function_call(lua_State *L)
+            {
+                lua_function *func = (lua_function *) lua_touserdata(L, lua_upvalueindex(1));
+                return (*func)(L);
+            }
+            
+            static int function_list___gc(lua_State *L)
+            {
+                function_list *list = (function_list *) lua_touserdata(L, -1);
+                delete list;
+                return 0;
+            }
+
+            static void push(lua_State *L, const lua_function &val)
+            {
+                lua_getfield(L, LUA_REGISTRYINDEX, "function_state");
+                if(lua_isnil(L, -1)) {
+                    new (lua_newuserdata(L, sizeof(function_list))) function_list();
+                    luaL_newmetatable(L, "rts.function_state");
+                    lua_pushcfunction(L, &Stack<lua_function>::function_list___gc);
+                    lua_setfield(L, -2, "__gc");
+                    lua_setmetatable(L, -2);
+                } 
+
+                function_list *list = (function_list *) lua_touserdata(L, -1);
+                auto ret = list->insert(std::make_pair(list->size(), val));
+                assert(ret.second);
+
+                lua_pushlightuserdata(L, &(*ret.first));
+                lua_pushcclosure(L, &lua_function_call, 1);
+            }
+
+            static lua_function get(lua_State *L, int n);
         };
     }
 }

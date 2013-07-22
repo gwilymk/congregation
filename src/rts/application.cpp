@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include "rts/states/title_state.hpp"
 
 #include <SFML/Window/Event.hpp>
 
@@ -7,6 +8,8 @@ namespace rts
     namespace
     {
         const sf::Time TIME_PER_FRAME = sf::seconds(1.0 / 30.0);
+
+        const int MAX_FRAME_SKIPS = 5;
     }
 
     Application::Application():
@@ -23,18 +26,27 @@ namespace rts
         sf::Clock clock;
         sf::Time time_since_last_update = sf::Time::Zero;
 
+        m_state_stack.push_state(states::ID::TitleState);
+        m_state_stack.update(TIME_PER_FRAME);
+
         while(m_render_window.isOpen())
         {
             process_input();
             time_since_last_update += clock.restart();
 
-            while(time_since_last_update > TIME_PER_FRAME) {
+            int skips = 0;
+
+            while(time_since_last_update > TIME_PER_FRAME && skips >= MAX_FRAME_SKIPS) {
                 time_since_last_update -= TIME_PER_FRAME;
                 process_input();
                 update(TIME_PER_FRAME);
+                skips++;
             }
 
             draw();
+
+            if(m_state_stack.is_empty())
+                m_render_window.close();
         }
 
         return 0;
@@ -62,6 +74,6 @@ namespace rts
 
     void Application::register_states()
     {
-           
+        m_state_stack.register_state<states::TitleState>(states::ID::TitleState);
     }
 }

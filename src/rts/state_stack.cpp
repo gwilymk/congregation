@@ -44,6 +44,11 @@ namespace rts
             (*itr)->draw();
     }
 
+    bool StateStack::is_empty()
+    {
+        return m_stack.empty();
+    }
+
     void StateStack::apply_pending_changes()
     {
         for(auto change : m_pending_list) {

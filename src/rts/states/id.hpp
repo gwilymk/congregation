@@ -6,6 +6,7 @@ namespace rts
     namespace states
     {
         enum class ID { 
+            TitleState,
             NumStates, 
         };
     }

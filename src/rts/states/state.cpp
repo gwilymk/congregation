@@ -12,6 +12,14 @@ namespace rts
         {
         }
 
+        State::State(StateStack &stack, Context context):
+            m_stack(&stack), 
+            m_context(context)
+        {
+        }
+
+        State::~State() {}
+
         void State::request_stack_push(ID stateID)
         {
             m_stack->push_state(stateID);
