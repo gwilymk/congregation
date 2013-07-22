@@ -3,10 +3,10 @@
 
 #ifndef NDEBUG
 #define assert(x) \
-    do { if(!(x)) { rts::assert::fail(#x, __FILE__, __LINE__); } } while(__LINE__ != -1)
+    do { if(!(x)) { rts::assert::fail(#x, __FILE__, __LINE__); } } while(__LINE__ == -1)
 #else
 #define assert(x) \
-    do { (void)sizeof(x); } while(__LINE__ != -1)
+    do { (void)sizeof(x); } while(__LINE__ == -1)
 #endif
 
 namespace rts
