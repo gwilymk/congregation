@@ -1,5 +1,6 @@
 #include "application.hpp"
 #include "rts/states/title_state.hpp"
+#include "rts/states/loading_state.hpp"
 
 #include <SFML/Window/Event.hpp>
 
@@ -14,8 +15,9 @@ namespace rts
 
     Application::Application():
         m_render_window(sf::VideoMode(800, 600), "rts"),
-        m_lua_state(),
-        m_state_stack(states::State::Context(m_render_window))
+        m_texture_holder(),
+        m_font_holder(),
+        m_state_stack(states::State::Context(m_render_window, m_texture_holder, m_font_holder))
     {
         m_render_window.setVerticalSyncEnabled(true);
         register_states();
@@ -28,7 +30,7 @@ namespace rts
         sf::Clock clock;
         sf::Time time_since_last_update = sf::Time::Zero;
 
-        m_state_stack.push_state(states::ID::TitleState);
+        m_state_stack.push_state(states::ID::LoadingState);
         m_state_stack.update(TIME_PER_FRAME);
 
         while(m_render_window.isOpen())
@@ -81,5 +83,6 @@ namespace rts
     void Application::register_states()
     {
         m_state_stack.register_state<states::TitleState>(states::ID::TitleState);
+        m_state_stack.register_state<states::LoadingState>(states::ID::LoadingState);
     }
 }

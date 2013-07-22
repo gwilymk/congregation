@@ -2,7 +2,7 @@
 #define APPLICATION_HPP
 
 #include "rts/state_stack.hpp"
-#include "rts/lua/state.hpp"
+#include "rts/holders/holder.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -26,7 +26,8 @@ namespace rts
 
         private:
             sf::RenderWindow m_render_window;
-            lua::State m_lua_state;
+            holders::TextureHolder m_texture_holder;
+            holders::FontHolder m_font_holder;
             StateStack m_state_stack;
     };
 }

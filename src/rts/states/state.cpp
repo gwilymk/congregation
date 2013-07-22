@@ -6,8 +6,10 @@ namespace rts
 {
     namespace states
     {
-        State::Context::Context(sf::RenderWindow &window):
-            window(&window)
+        State::Context::Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder):
+            window(&window),
+            texture_holder(&texture_holder),
+            font_holder(&font_holder)
         {
         }
 

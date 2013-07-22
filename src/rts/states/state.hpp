@@ -6,6 +6,7 @@
 #include <SFML/System/Time.hpp>
 
 #include "id.hpp"
+#include "rts/holders/holder.hpp"
 
 namespace sf
 {
@@ -25,9 +26,11 @@ namespace rts
                 typedef std::unique_ptr<State> ptr;
 
                 struct Context {
-                    Context(sf::RenderWindow &window);
+                    Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder);
 
                     sf::RenderWindow *window;
+                    holders::TextureHolder *texture_holder;
+                    holders::FontHolder *font_holder;
                 };
 
             public:
