@@ -8,6 +8,7 @@ namespace rts
         enum class ID { 
             LoadingState,
             TitleState,
+            MainMenuState,
             NumStates, 
         };
     }

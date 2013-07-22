@@ -1,6 +1,7 @@
 #include "application.hpp"
-#include "rts/states/title_state.hpp"
 #include "rts/states/loading_state.hpp"
+#include "rts/states/main_menu.hpp"
+#include "rts/states/title_state.hpp"
 
 #include <SFML/Window/Event.hpp>
 
@@ -84,5 +85,6 @@ namespace rts
     {
         m_state_stack.register_state<states::TitleState>(states::ID::TitleState);
         m_state_stack.register_state<states::LoadingState>(states::ID::LoadingState);
+        m_state_stack.register_state<states::MainMenuState>(states::ID::MainMenuState);
     }
 }

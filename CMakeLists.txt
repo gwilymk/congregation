@@ -16,6 +16,7 @@ add_executable(${EXECUTABLE_NAME}
     src/rts/common.cpp
     src/rts/lua/state.cpp
     src/rts/states/loading_state.cpp
+    src/rts/states/main_menu.cpp
     src/rts/states/state.cpp
     src/rts/state_stack.cpp
     src/rts/states/title_state.cpp
