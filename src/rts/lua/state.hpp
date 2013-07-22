@@ -23,6 +23,11 @@ namespace rts
                 void set_top(int index);
                 void push_value(int index);
                 void push_global(const std::string &name);
+                void get_global(const std::string &name);
+                void set_global(const std::string &name);
+                void get_field(int index, const std::string &name);
+                void set_field(int index, const std::string &name);
+                void new_table();
                 void remove(int index);
                 int type(int index);
                 const char *type_name(int index);

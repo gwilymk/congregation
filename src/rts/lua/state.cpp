@@ -40,6 +40,31 @@ namespace rts
             lua_getglobal(L, name.c_str());
         }
 
+        void State::get_global(const std::string &name)
+        {
+            lua_getglobal(L, name.c_str()); 
+        }
+
+        void State::set_global(const std::string &name)
+        {
+            lua_setglobal(L, name.c_str());
+        }
+
+        void State::get_field(int index, const std::string &name)
+        {
+            lua_getfield(L, index, name.c_str()); 
+        }
+
+        void State::set_field(int index, const std::string &name)
+        {
+            lua_setfield(L, index, name.c_str());
+        }
+
+        void State::new_table()
+        {
+            lua_newtable(L); 
+        }
+
         void State::remove(int index)
         {
             lua_remove(L, index); 
