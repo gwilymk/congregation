@@ -13,9 +13,12 @@ set(EXECUTABLE_NAME "rts")
 add_executable(${EXECUTABLE_NAME} 
     src/main.cpp
     src/rts/application.cpp
+    src/rts/common.cpp
+    src/rts/states/state.cpp
+    src/rts/state_stack.cpp
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2 COMPONENTS window graphics network audio system REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES})
-include_directories(${SFML_INCULDE_DIR})
+include_directories(${SFML_INCULDE_DIR} ${CMAKE_SOURCE_DIR}/src)
