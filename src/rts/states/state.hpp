@@ -42,7 +42,7 @@ namespace rts
                 virtual bool handle_event(const sf::Event &event) = 0;
 
             protected:
-                void request_stack_push(states::ID stateID);
+                void request_stack_push(ID stateID);
                 void request_stack_pop();
                 void request_stack_clear();
 
