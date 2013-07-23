@@ -3,8 +3,10 @@
 
 #include "rts/states/state.hpp"
 #include "rts/states/game/command_list.hpp"
+#include "rts/states/game/tile.hpp"
 
 #include <SFGUI/Desktop.hpp>
+#include <vector>
 
 namespace rts
 {
@@ -22,6 +24,8 @@ namespace rts
             private:
                 sfg::Desktop m_desktop;
                 game::CommandList m_commands;
+
+                std::vector<game::Tile> m_tiles;
         };
     }
 }

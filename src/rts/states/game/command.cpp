@@ -24,7 +24,7 @@ namespace rts
 
                 switch(command.type) {
                     case Command::COMMAND::PlacePiece:
-                        packet << command.piece_place.x << command.piece_place.y << command.piece_place.tileid;
+                        packet << command.piece_place.x << command.piece_place.y << command.piece_place.tile;
                         break;
                         
                     case Command::COMMAND::MoveUnits:
@@ -52,7 +52,7 @@ namespace rts
 
                 switch(command.type) {
                     case Command::COMMAND::PlacePiece:
-                        packet >> command.piece_place.x >> command.piece_place.y >> command.piece_place.tileid; 
+                        packet >> command.piece_place.x >> command.piece_place.y >> command.piece_place.tile; 
                         break;
 
                     case Command::COMMAND::MoveUnits:

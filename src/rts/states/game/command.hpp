@@ -1,9 +1,10 @@
 #ifndef COMMAND_HPP
 #define COMMAND_HPP
 
+#include "rts/states/game/tile.hpp"
+
 #include <vector>
 #include <SFML/Config.hpp>
-
 #include <SFML/Network/Packet.hpp>
 
 namespace rts
@@ -23,7 +24,7 @@ namespace rts
                 struct {
                     sf::Uint8 x;
                     sf::Uint8 y;
-                    sf::Uint8 tileid;
+                    Tile tile;
                 } piece_place;
                 struct {
                     std::vector<sf::Uint16> to_move;
