@@ -11,10 +11,7 @@ namespace rts
         {
             m_box = sfg::Box::Create(sfg::Box::VERTICAL, 1.5f);
 
-            sfg::Button::Ptr b1 = sfg::Button::Create("Single Player");
-            b1->GetSignal(sfg::Button::OnLeftClick).Connect(&MainMenuState::start_singleplayer, this);
-            m_box->Pack(b1);
-            sfg::Button::Ptr b2 = sfg::Button::Create("Multi Player");
+            sfg::Button::Ptr b2 = sfg::Button::Create("Play");
             b2->GetSignal(sfg::Button::OnLeftClick).Connect(&MainMenuState::start_multiplayer, this);
             m_box->Pack(b2);
             sfg::Button::Ptr b3 = sfg::Button::Create("Settings");
@@ -51,12 +48,10 @@ namespace rts
             return true;
         }
 
-        void MainMenuState::start_singleplayer()
-        {
-        }
-
         void MainMenuState::start_multiplayer()
         {
+            request_stack_pop();
+            request_stack_push(ID::GameState);
         }
 
         void MainMenuState::settings()
