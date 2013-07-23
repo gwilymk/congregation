@@ -9,7 +9,7 @@ namespace rts
         MainMenuState::MainMenuState(StateStack &stack, Context context):
             State(stack, context)
         {
-            m_box = sfg::Box::Create(sfg::Box::VERTICAL, 0.5f);
+            m_box = sfg::Box::Create(sfg::Box::VERTICAL, 1.5f);
 
             sfg::Button::Ptr b1 = sfg::Button::Create("Single Player");
             b1->GetSignal(sfg::Button::OnLeftClick).Connect(&MainMenuState::start_singleplayer, this);
@@ -17,6 +17,8 @@ namespace rts
             sfg::Button::Ptr b2 = sfg::Button::Create("Multi Player");
             b2->GetSignal(sfg::Button::OnLeftClick).Connect(&MainMenuState::start_multiplayer, this);
             m_box->Pack(b2);
+
+            m_box->SetPosition(sf::Vector2f(100, 300));
         }
 
         void MainMenuState::draw()
