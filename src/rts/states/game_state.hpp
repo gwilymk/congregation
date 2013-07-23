@@ -3,6 +3,8 @@
 
 #include "rts/states/state.hpp"
 
+#include <SFGUI/Desktop.hpp>
+
 namespace rts
 {
     namespace states
@@ -15,6 +17,9 @@ namespace rts
                 virtual void draw();
                 virtual bool update(sf::Time dt);
                 virtual bool handle_event(const sf::Event &event);
+
+            private:
+                sfg::Desktop m_desktop;
         };
     }
 }
