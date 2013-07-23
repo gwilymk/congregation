@@ -14,22 +14,26 @@ namespace rts
         {
             struct Command
             {
-                enum COMMAND { PlacePiece, MoveUnits };
-                sf::Uint8 type;
+                enum COMMAND { PlacePiece, MoveUnits, Invalid };
 
-                union {
-                    struct {
-                        sf::Uint8 x;
-                        sf::Uint8 y;
-                        sf::Uint8 tileid;
-                    } piece_place;
-                    struct {
-                        std::vector<sf::Uint16> to_move;
-                        sf::Uint8 x;
-                        sf::Uint8 y;
-                    } unit_move;
-                } data;
+                sf::Uint8 type = COMMAND::Invalid;
+                sf::Uint8 player;
+                sf::Uint32 turn;
+
+                struct {
+                    sf::Uint8 x;
+                    sf::Uint8 y;
+                    sf::Uint8 tileid;
+                } piece_place;
+                struct {
+                    std::vector<sf::Uint16> to_move;
+                    sf::Uint8 x;
+                    sf::Uint8 y;
+                } unit_move;
+
+                static bool less(const Command &a, const Command &b);
             };
+
 
             sf::Packet &operator<<(sf::Packet &packet, const Command &command);
             sf::Packet &operator>>(sf::Packet &packet, Command &command);

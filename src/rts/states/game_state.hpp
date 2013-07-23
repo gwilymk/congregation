@@ -2,6 +2,7 @@
 #define GAME_STATE_HPP
 
 #include "rts/states/state.hpp"
+#include "rts/states/game/command_list.hpp"
 
 #include <SFGUI/Desktop.hpp>
 
@@ -20,6 +21,7 @@ namespace rts
 
             private:
                 sfg::Desktop m_desktop;
+                game::CommandList m_commands;
         };
     }
 }

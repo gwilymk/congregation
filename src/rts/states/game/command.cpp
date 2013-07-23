@@ -8,22 +8,33 @@ namespace rts
     {
         namespace game
         {
+            bool Command::less(const Command &a, const Command &b)
+            {
+                if(a.turn == b.turn)
+                    return a.player < b.player;
+                else
+                    return a.turn < b.turn;
+            }
+
             sf::Packet &operator<<(sf::Packet &packet, const Command &command)
             {
                 packet << command.type;
+                packet << command.player;
+                packet << command.turn;
+
                 switch(command.type) {
                     case Command::COMMAND::PlacePiece:
-                        packet << command.data.piece_place.x << command.data.piece_place.y << command.data.piece_place.tileid;
+                        packet << command.piece_place.x << command.piece_place.y << command.piece_place.tileid;
                         break;
                         
                     case Command::COMMAND::MoveUnits:
-                        packet << (sf::Uint16) command.data.unit_move.to_move.size();
+                        packet << (sf::Uint16) command.unit_move.to_move.size();
                         
-                        for(sf::Uint16 id : command.data.unit_move.to_move) {
+                        for(sf::Uint16 id : command.unit_move.to_move) {
                             packet << id;
                         }
 
-                        packet << command.data.unit_move.x << command.data.unit_move.y;
+                        packet << command.unit_move.x << command.unit_move.y;
                         break;
 
                     default:
@@ -36,23 +47,25 @@ namespace rts
             sf::Packet &operator>>(sf::Packet &packet, Command &command)
             {
                 packet >> command.type;
+                packet >> command.player;
+                packet >> command.turn;
 
                 switch(command.type) {
                     case Command::COMMAND::PlacePiece:
-                        packet >> command.data.piece_place.x >> command.data.piece_place.y >> command.data.piece_place.tileid; 
+                        packet >> command.piece_place.x >> command.piece_place.y >> command.piece_place.tileid; 
                         break;
 
                     case Command::COMMAND::MoveUnits:
                         sf::Uint16 size;
                         packet >> size;
-                        command.data.unit_move.to_move = std::vector<sf::Uint16>();
-                        command.data.unit_move.to_move.reserve(size);
+                        command.unit_move.to_move = std::vector<sf::Uint16>();
+                        command.unit_move.to_move.reserve(size);
 
                         for(sf::Int16 i = 0 ; i < size ; ++i) {
-                            packet >> command.data.unit_move.to_move[i];
+                            packet >> command.unit_move.to_move[i];
                         }
 
-                        packet >> command.data.unit_move.x >> command.data.unit_move.y;
+                        packet >> command.unit_move.x >> command.unit_move.y;
                         break;
 
                     default:

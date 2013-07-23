@@ -6,7 +6,8 @@ namespace rts
     {
         GameState::GameState(StateStack &stack, Context context):
             State(stack, context),
-            m_desktop()
+            m_desktop(),
+            m_commands(5)
         {
         }
 
