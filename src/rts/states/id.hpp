@@ -9,6 +9,7 @@ namespace rts
             LoadingState,
             TitleState,
             MainMenuState,
+            GameState,
             NumStates, 
         };
     }

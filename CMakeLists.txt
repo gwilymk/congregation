@@ -22,6 +22,7 @@ add_executable(${EXECUTABLE_NAME}
     src/rts/states/state.cpp
     src/rts/state_stack.cpp
     src/rts/states/title_state.cpp
+    src/rts/states/game_state.cpp
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
