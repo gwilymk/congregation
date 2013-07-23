@@ -15,12 +15,14 @@ namespace rts
     }
 
     Application::Application():
+        m_sfgui(),
         m_render_window(sf::VideoMode(800, 600), "rts"),
         m_texture_holder(),
         m_font_holder(),
         m_state_stack(states::State::Context(m_render_window, m_texture_holder, m_font_holder))
     {
         m_render_window.setVerticalSyncEnabled(true);
+        m_render_window.resetGLStates();
         register_states();
     }
 
@@ -70,6 +72,7 @@ namespace rts
     {
         m_render_window.clear();
         m_state_stack.draw();
+        m_sfgui.Display(m_render_window);
         m_render_window.display();
     }
 

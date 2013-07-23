@@ -16,10 +16,6 @@ add_executable(${EXECUTABLE_NAME}
     src/main.cpp
     src/rts/application.cpp
     src/rts/common.cpp
-    src/rts/gui/button.cpp
-    src/rts/gui/container.cpp
-    src/rts/gui/element.cpp
-    src/rts/gui/label.cpp
     src/rts/lua/state.cpp
     src/rts/states/loading_state.cpp
     src/rts/states/main_menu.cpp
@@ -30,6 +26,8 @@ add_executable(${EXECUTABLE_NAME}
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2 COMPONENTS audio graphics window network system REQUIRED)
+set(SFGUI_STATIC_LIBRARIES TRUE)
+find_package(SFGUI REQUIRED)
 find_package(Lua51 REQUIRED)
-target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES} ${LUA_LIBRARIES})
-include_directories(${SFML_INCULDE_DIR} ${LUA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(${EXECUTABLE_NAME} ${SFGUI_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES})
+include_directories(${SFML_INCULDE_DIR} ${SFGUI_INCLUDE_DIR} ${LUA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src)

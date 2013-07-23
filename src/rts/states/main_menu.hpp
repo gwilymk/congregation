@@ -2,7 +2,8 @@
 #define MAIN_MENU_HPP
 
 #include "rts/states/state.hpp"
-#include "rts/gui/container.hpp"
+#include <SFGUI/Box.hpp>
+#include <SFGUI/Button.hpp>
 
 namespace rts
 {
@@ -18,7 +19,12 @@ namespace rts
                 virtual bool handle_event(const sf::Event &event);
 
             private:
-                gui::Container m_container;
+                void start_singleplayer();
+                void start_multiplayer();
+                void settings();
+
+            private:
+                sfg::Box::Ptr m_box;
         };
     }
 }

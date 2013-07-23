@@ -2,9 +2,9 @@
 #define TITLE_STATE_HPP
 
 #include "rts/states/state.hpp"
-#include "rts/gui/label.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 namespace rts
 {
@@ -21,7 +21,7 @@ namespace rts
 
             private:
                 sf::Sprite m_background_sprite;
-                gui::Label m_label;
+                sf::Text m_text;
 
                 sf::Time m_text_effect_time;
         };

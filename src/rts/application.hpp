@@ -5,6 +5,7 @@
 #include "rts/holders/holder.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFGUI/SFGUI.hpp>
 
 namespace rts
 {
@@ -25,6 +26,7 @@ namespace rts
             void register_states();
 
         private:
+            sfg::SFGUI m_sfgui;
             sf::RenderWindow m_render_window;
             holders::TextureHolder m_texture_holder;
             holders::FontHolder m_font_holder;
