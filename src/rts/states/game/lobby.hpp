@@ -29,6 +29,10 @@ namespace rts
                     void update();
 
                 private:
+                    void server_update();
+                    void client_update();
+
+                private:
                     bool *m_done;
                     std::unique_ptr<Impl> m_impl;
 

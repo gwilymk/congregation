@@ -11,7 +11,7 @@
 namespace
 {
     const std::string has_server_message = "server?";
-    const std::string reply = "me!";
+    const std::string reply_message = "me!";
     const unsigned short broadcast_port = 10037;
 
     template <typename T>
@@ -130,14 +130,42 @@ namespace rts
 
             void Lobby::update()
             {
+                if(server) {
+                    server_update();
+                } else {
+                    client_update(); 
+                }
+            }
+
+            void Lobby::server_update()
+            {
                 sf::Packet packet;
                 sf::IpAddress addr;
                 unsigned short port;
                 if(m_impl->broadcast_socket.receive(packet, addr, port) == sf::Socket::Done) {
                     std::string message;
                     packet >> message;
-                    if(message == has_server_message)
+                    if(message == has_server_message) {
                         std::cerr << "Yay! " << addr.toString() << ":" << port << std::endl;
+                        sf::Packet reply;
+                        reply << reply_message;
+                        m_impl->broadcast_socket.send(reply, addr, port);
+                    }
+                }
+            }
+
+            void Lobby::client_update()
+            {
+                sf::Packet packet;
+                sf::IpAddress addr;
+                unsigned short port;
+
+                if(m_impl->broadcast_socket.receive(packet, addr, port) == sf::Socket::Done) {
+                    std::string message;
+                    packet >> message;
+                    if(message == reply_message) {
+                        std::cerr << "Found server: " << addr.toString() << ":" << port << std::endl;
+                    }
                 }
             }
         }
