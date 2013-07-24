@@ -31,8 +31,8 @@ namespace rts
                     void create_server();
                     void update(sf::Time dt);
 
-                    bool server();
-                    network::ServerInfo get_server_info();
+                    bool server() const;
+                    network::ServerInfo get_server_info() const;
 
                 private:
                     void server_update(sf::Time dt);

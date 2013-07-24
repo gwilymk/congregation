@@ -66,7 +66,9 @@ namespace rts
             }
 
             Lobby::~Lobby()
-            {}
+            {
+                m_impl->desktop->Remove(m_impl->window);
+            }
 
             void Lobby::add_to_desktop(sfg::Desktop &desktop)
             {
@@ -155,12 +157,12 @@ namespace rts
                 *m_done = true;
             }
 
-            bool Lobby::server()
+            bool Lobby::server() const
             {
                 return m_server;
             }
 
-            network::ServerInfo Lobby::get_server_info()
+            network::ServerInfo Lobby::get_server_info() const
             {
                 return m_impl->info;
             }

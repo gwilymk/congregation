@@ -49,13 +49,20 @@ namespace rts
 
         void GameState::lobby_update(sf::Time dt)
         {
-            m_lobby->update(dt);
+            if(!m_lobby_done)
+                m_lobby->update(dt);
+
             if(m_lobby_done) {
                 if(m_lobby->server()) {
                 
                 } else {
                 
                 }
+
+                delete m_lobby;
+                m_lobby = nullptr;
+
+                m_state = CurrentState::Waiting;
             }
         }
     }
