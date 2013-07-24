@@ -10,10 +10,6 @@
 
 namespace
 {
-    const std::string has_server_message = "server?";
-    const std::string reply_message = "me!";
-    const unsigned short broadcast_port = 10037;
-
     const sf::Time time_to_wait = sf::seconds(5);
 
     template <typename T>
@@ -123,8 +119,8 @@ namespace rts
                 assert(!*m_done);
 
                 sf::Packet packet;
-                packet << has_server_message;
-                m_impl->broadcast_socket.send(packet, sf::IpAddress::Broadcast, broadcast_port);
+                packet << network::has_server_message;
+                m_impl->broadcast_socket.send(packet, sf::IpAddress::Broadcast, network::broadcast_port);
                 m_impl->update_spinner->Start();
                 m_impl->time_since_update = sf::Time::Zero;
             }
@@ -146,7 +142,7 @@ namespace rts
 
                 for(unsigned int i = 0; i < network::sizes.size(); ++i) {
                     if(network::sizes[i] == map_size_str) {
-                        m_impl->info.map_size = i;
+                        m_impl->info.map_size = network::map_sizes[i];
                         break;
                     } 
                 }
@@ -174,23 +170,6 @@ namespace rts
                 }
             }
 
-            void Lobby::server_update(sf::Time dt)
-            {
-                sf::Packet packet;
-                sf::IpAddress addr;
-                unsigned short port;
-                if(m_impl->broadcast_socket.receive(packet, addr, port) == sf::Socket::Done) {
-                    std::string message;
-                    packet >> message;
-                    if(message == has_server_message) {
-                        std::cerr << "Yay! " << addr.toString() << ":" << port << std::endl;
-                        sf::Packet reply;
-                        reply << reply_message;
-                        m_impl->broadcast_socket.send(reply, addr, port);
-                    }
-                }
-            }
-
             void Lobby::client_update(sf::Time dt)
             {
                 m_impl->time_since_update += dt;
@@ -206,9 +185,17 @@ namespace rts
 
                 if(m_impl->broadcast_socket.receive(packet, addr, port) == sf::Socket::Done) {
                     std::string message;
+                    network::ServerInfo info;
                     packet >> message;
-                    if(message == reply_message) {
+                    if(message == network::reply_message) {
                         std::cerr << "Found server: " << addr.toString() << ":" << port << std::endl;
+                        sf::TcpSocket request_socket;
+
+                        assert(request_socket.connect(addr, network::listen_port) == sf::Socket::Done);
+                        assert(request_socket.receive(packet) == sf::Socket::Done);
+                        assert(packet >> info);
+
+                        std::cerr << info.map_size << std::endl;
                     }
                 }
             }

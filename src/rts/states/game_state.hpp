@@ -10,6 +10,7 @@
 
 namespace rts
 {
+    namespace network { class Server; }
     namespace states
     {
         namespace game { class Lobby; }
@@ -37,6 +38,7 @@ namespace rts
                 sfg::Desktop m_desktop;
                 game::CommandList m_commands;
                 game::Lobby *m_lobby;
+                network::Server *m_server;
 
                 CurrentState m_state;
 

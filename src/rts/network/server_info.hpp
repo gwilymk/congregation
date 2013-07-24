@@ -12,7 +12,13 @@ namespace rts
     namespace network
     {
         const std::vector<std::string> sizes = { "Small", "Medium", "Large" };
+        const sf::Uint8 map_sizes[] = { 32, 48, 64 };
         const int max_players = 8;
+
+        const std::string has_server_message = "server?";
+        const std::string reply_message = "me!";
+        const unsigned short broadcast_port = 10037;
+        const unsigned short listen_port = 10038;
 
         struct ServerInfo
         {
