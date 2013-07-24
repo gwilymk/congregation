@@ -14,6 +14,8 @@ namespace
     const std::string reply_message = "me!";
     const unsigned short broadcast_port = 10037;
 
+    const sf::Time time_to_wait = sf::seconds(5);
+
     template <typename T>
     std::string number_to_string(T Number)
     {
@@ -46,6 +48,7 @@ namespace rts
                 sfg::ComboBox::Ptr map_size;
 
                 sfg::Spinner::Ptr update_spinner;
+                sf::Time time_since_update;
 
                 sf::UdpSocket broadcast_socket;
                 sfg::Desktop *desktop;
@@ -119,6 +122,8 @@ namespace rts
                 sf::Packet packet;
                 packet << has_server_message;
                 m_impl->broadcast_socket.send(packet, sf::IpAddress::Broadcast, broadcast_port);
+                m_impl->update_spinner->Start();
+                m_impl->time_since_update = sf::Time::Zero;
             }
 
             void Lobby::create_server()
@@ -128,16 +133,16 @@ namespace rts
                 m_impl->broadcast_socket.bind(broadcast_port);
             }
 
-            void Lobby::update()
+            void Lobby::update(sf::Time dt)
             {
                 if(server) {
-                    server_update();
+                    server_update(dt);
                 } else {
-                    client_update(); 
+                    client_update(dt); 
                 }
             }
 
-            void Lobby::server_update()
+            void Lobby::server_update(sf::Time dt)
             {
                 sf::Packet packet;
                 sf::IpAddress addr;
@@ -154,8 +159,15 @@ namespace rts
                 }
             }
 
-            void Lobby::client_update()
+            void Lobby::client_update(sf::Time dt)
             {
+                m_impl->time_since_update += dt;
+                
+                if(m_impl->time_since_update >= time_to_wait) {
+                    m_impl->update_spinner->Stop();
+                    return;
+                }
+
                 sf::Packet packet;
                 sf::IpAddress addr;
                 unsigned short port;

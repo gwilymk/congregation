@@ -22,7 +22,7 @@ namespace rts
         {
             m_desktop.Update(dt.asSeconds());
             if(!m_lobby_done)
-                m_lobby.update();
+                m_lobby.update(dt);
 
             return true;
         }

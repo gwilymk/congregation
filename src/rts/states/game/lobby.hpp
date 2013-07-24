@@ -2,6 +2,7 @@
 #define LOBBY_HPP
 
 #include <SFML/System/NonCopyable.hpp>
+#include <SFML/System/Time.hpp>
 #include <memory>
 
 namespace sfg
@@ -26,11 +27,11 @@ namespace rts
                     void add_to_desktop(sfg::Desktop &desktop);
                     void update_server_list();
                     void create_server();
-                    void update();
+                    void update(sf::Time dt);
 
                 private:
-                    void server_update();
-                    void client_update();
+                    void server_update(sf::Time dt);
+                    void client_update(sf::Time dt);
 
                 private:
                     bool *m_done;
