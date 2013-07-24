@@ -10,8 +10,8 @@
 
 namespace
 {
-    const char *has_server_message = "server?\0";
-    const std::size_t message_size = 8;
+    const std::string has_server_message = "server?";
+    const std::string reply = "me!";
     const unsigned short broadcast_port = 10037;
 
     template <typename T>
@@ -39,15 +39,6 @@ namespace rts
 
             struct Lobby::Impl
             {
-                Impl()
-                {
-                    message = new char[message_size];
-                }
-                ~Impl()
-                {
-                    delete [] message;
-                }
-
                 sfg::Window::Ptr window;
                 sfg::Box::Ptr server_list;
 
@@ -58,8 +49,6 @@ namespace rts
 
                 sf::UdpSocket broadcast_socket;
                 sfg::Desktop *desktop;
-
-                char *message;
             };
 
             Lobby::Lobby(bool *done):
@@ -127,7 +116,9 @@ namespace rts
             {
                 assert(!*m_done);
 
-                m_impl->broadcast_socket.send(has_server_message, message_size, sf::IpAddress::Broadcast, broadcast_port);
+                sf::Packet packet;
+                packet << has_server_message;
+                m_impl->broadcast_socket.send(packet, sf::IpAddress::Broadcast, broadcast_port);
             }
 
             void Lobby::create_server()
@@ -139,13 +130,14 @@ namespace rts
 
             void Lobby::update()
             {
-                std::size_t recieved;
+                sf::Packet packet;
                 sf::IpAddress addr;
                 unsigned short port;
-                if(m_impl->broadcast_socket.receive((void *)m_impl->message, message_size, recieved, addr, port) == sf::Socket::Done) {
-                    if(recieved == message_size)
-                        if(m_impl->message[0] == 's')
-                            std::cerr << "Yes!!!" << addr.toString() << " " << port << "\n";
+                if(m_impl->broadcast_socket.receive(packet, addr, port) == sf::Socket::Done) {
+                    std::string message;
+                    packet >> message;
+                    if(message == has_server_message)
+                        std::cerr << "Yay! " << addr.toString() << ":" << port << std::endl;
                 }
             }
         }
