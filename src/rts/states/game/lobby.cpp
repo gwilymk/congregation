@@ -5,6 +5,8 @@
 #include <SFML/Network.hpp>
 #include <string>
 #include <sstream>
+#include <cstdlib>
+#include <stdarg.h>
 
 #include <iostream>
 
@@ -18,6 +20,27 @@ namespace
         std::ostringstream ss;
         ss << Number;
         return ss.str();
+    }
+
+    std::string string_format(const std::string fmt, ...) {
+        int size = 100;
+        std::string str;
+        va_list ap;
+        while (1) {
+            str.resize(size);
+            va_start(ap, fmt);
+            int n = vsnprintf((char *)str.c_str(), size, fmt.c_str(), ap);
+            va_end(ap);
+            if (n > -1 && n < size) {
+                str.resize(n);
+                return str;
+            }
+            if (n > -1)
+                size = n + 1;
+            else
+                size *= 2;
+        }
+        return str;
     }
 }
 
@@ -49,13 +72,32 @@ namespace rts
                 sf::UdpSocket broadcast_socket;
                 sfg::Desktop *desktop;
 
+                std::vector<sf::IpAddress> servers;
+                std::vector<std::unique_ptr<ButtonCallback>> callbacks;
+
                 network::ServerInfo info;
+            };
+
+            struct Lobby::ButtonCallback
+            {
+                ButtonCallback(Lobby *parent, int server):
+                    parent(parent), server(server) {}
+
+                void call()
+                {
+                    parent->set_server(server);
+                    *parent->m_done = true;
+                }
+
+                Lobby *parent;
+                int server;
             };
 
             Lobby::Lobby(bool *done):
                 m_done(done),
                 m_impl(new Impl),
-                m_server(false)
+                m_server(false),
+                m_serverid(-1)
             {
                 *m_done = false;
                 m_impl->broadcast_socket.setBlocking(false);
@@ -76,7 +118,7 @@ namespace rts
                 m_impl->window->Add(notebook);
                 m_impl->server_list = sfg::Box::Create(sfg::Box::VERTICAL);
                 sfg::ScrolledWindow::Ptr scrolled = sfg::ScrolledWindow::Create();
-                scrolled->Add(m_impl->server_list);
+                scrolled->AddWithViewport(m_impl->server_list);
                 scrolled->SetScrollbarPolicy(sfg::ScrolledWindow::HORIZONTAL_NEVER | sfg::ScrolledWindow::VERTICAL_ALWAYS);
                 sfg::Box::Ptr vbox = sfg::Box::Create(sfg::Box::VERTICAL, 2.0f);
                 sfg::Box::Ptr hbox = sfg::Box::Create(sfg::Box::HORIZONTAL, 2.0f);
@@ -117,6 +159,9 @@ namespace rts
             void Lobby::update_server_list()
             {
                 assert(!*m_done);
+                m_impl->server_list->RemoveAll();
+                m_impl->servers.clear();
+                m_impl->callbacks.clear();
 
                 sf::Packet packet;
                 packet << network::has_server_message;
@@ -133,7 +178,7 @@ namespace rts
                 if(num_players_str.isEmpty()) 
                     return;
                     
-                int num_players = std::stoi(num_players_str.toAnsiString());
+                int num_players = std::atoi(num_players_str.toAnsiString().c_str());
                 m_impl->info.max_players = num_players;
 
                 sf::String map_size_str = m_impl->map_size->GetSelectedText();
@@ -142,7 +187,7 @@ namespace rts
 
                 for(unsigned int i = 0; i < network::sizes.size(); ++i) {
                     if(network::sizes[i] == map_size_str) {
-                        m_impl->info.map_size = network::map_sizes[i];
+                        m_impl->info.map_size = i;
                         break;
                     } 
                 }
@@ -194,10 +239,29 @@ namespace rts
                         assert(request_socket.connect(addr, network::listen_port) == sf::Socket::Done);
                         assert(request_socket.receive(packet) == sf::Socket::Done);
                         assert(packet >> info);
+                        request_socket.disconnect();
 
-                        std::cerr << info.map_size << std::endl;
+                        m_impl->servers.push_back(addr);
+                        std::ostringstream ss;
+                        ss << addr.toString() << ' ' << (unsigned) info.num_players << '/' << (unsigned) info.max_players << " (" << network::sizes.at(info.map_size) << ")";
+                        sfg::Button::Ptr b = sfg::Button::Create(ss.str());
+                        ButtonCallback *bc = new ButtonCallback(this, m_impl->servers.size() - 1);
+                        m_impl->callbacks.emplace_back(bc);
+                        b->GetSignal(sfg::Button::OnLeftClick).Connect(&ButtonCallback::call, bc);
+                        m_impl->server_list->Pack(b, false);
+                        m_impl->server_list->Refresh();
                     }
                 }
+            }
+
+            sf::IpAddress Lobby::get_server() const
+            {
+                return m_impl->servers[m_serverid];
+            }
+
+            void Lobby::set_server(int serverid)
+            {
+                m_serverid = serverid;
             }
         }
     }

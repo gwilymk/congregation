@@ -3,6 +3,8 @@
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/Time.hpp>
+
+#include <SFML/Network/IpAddress.hpp>
 #include <memory>
 
 #include "rts/network/server_info.hpp"
@@ -21,6 +23,7 @@ namespace rts
             class Lobby : private sf::NonCopyable
             {
                 struct Impl;
+                struct ButtonCallback;
 
                 public:
                     Lobby(bool *done);
@@ -34,15 +37,20 @@ namespace rts
                     bool server() const;
                     network::ServerInfo get_server_info() const;
 
+                    sf::IpAddress get_server() const;
+
                 private:
                     void server_update(sf::Time dt);
                     void client_update(sf::Time dt);
+
+                    void set_server(int serverid);
 
                 private:
                     bool *m_done;
                     std::unique_ptr<Impl> m_impl;
 
                     bool m_server;
+                    int m_serverid;
             };
         }
     }
