@@ -6,7 +6,7 @@
     do { if(!(x)) { rts::assert::fail(#x, __FILE__, __LINE__); } } while(__LINE__ == -1)
 #else
 #define assert(x) \
-    do { (void)sizeof(x); } while(__LINE__ == -1)
+    do { (x); } while(__LINE__ == -1)
 #endif
 
 namespace rts
