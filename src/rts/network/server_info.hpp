@@ -17,6 +17,10 @@ namespace rts
 
         const std::string has_server_message = "server?";
         const std::string reply_message = "me!";
+        const std::string want_info = "info please";
+        const std::string want_connection = "connection please";
+        const std::string info_update = "info update";
+
         const unsigned short broadcast_port = 10037;
         const unsigned short listen_port = 10038;
         const unsigned short peer_listen_port = 10039;

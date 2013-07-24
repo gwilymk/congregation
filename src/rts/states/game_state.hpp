@@ -4,8 +4,10 @@
 #include "rts/states/state.hpp"
 #include "rts/states/game/command_list.hpp"
 #include "rts/states/game/tile.hpp"
+#include "rts/network/channel.hpp"
 
 #include <SFGUI/Desktop.hpp>
+#include <SFGUI/Label.hpp>
 #include <vector>
 
 namespace rts
@@ -39,9 +41,11 @@ namespace rts
                 game::CommandList m_commands;
                 game::Lobby *m_lobby;
                 network::Server *m_server;
+                network::Channel m_channel;
 
                 CurrentState m_state;
 
+                sfg::Label::Ptr m_status_label;
                 std::vector<game::Tile> m_tiles;
         };
     }

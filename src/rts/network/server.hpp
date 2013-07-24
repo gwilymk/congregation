@@ -21,6 +21,9 @@ namespace rts
                 void listen();
 
             private:
+                void update_info();
+
+            private:
                 ServerInfo m_info;
                 std::unique_ptr<Impl> m_impl;
         };

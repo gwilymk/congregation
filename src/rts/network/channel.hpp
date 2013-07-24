@@ -28,10 +28,15 @@ namespace rts
                 void start_accepting_peers();
                 void stop_accepting_peers();
 
+                int num_players();
+                int max_players();
+
             private:
                 sf::TcpListener m_listener;
                 sf::TcpSocket m_server_socket;
                 bool m_accepting;
+
+                ServerInfo m_server_info;
 
                 std::vector<std::unique_ptr<sf::TcpSocket>> m_peers;
         };
