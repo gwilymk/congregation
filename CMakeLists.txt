@@ -17,6 +17,7 @@ add_executable(${EXECUTABLE_NAME}
     src/rts/application.cpp
     src/rts/common.cpp
     src/rts/lua/state.cpp
+    src/rts/network/channel.cpp
     src/rts/network/server.cpp
     src/rts/network/server_info.cpp
     src/rts/states/game/command.cpp

@@ -19,6 +19,7 @@ namespace rts
         const std::string reply_message = "me!";
         const unsigned short broadcast_port = 10037;
         const unsigned short listen_port = 10038;
+        const unsigned short peer_listen_port = 10039;
 
         struct ServerInfo
         {
