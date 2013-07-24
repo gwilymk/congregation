@@ -17,16 +17,17 @@ add_executable(${EXECUTABLE_NAME}
     src/rts/application.cpp
     src/rts/common.cpp
     src/rts/lua/state.cpp
+    src/rts/network/server_info.cpp
+    src/rts/states/game/command.cpp
+    src/rts/states/game/command_list.cpp
+    src/rts/states/game/lobby.cpp
     src/rts/states/game_state.cpp
+    src/rts/states/game/tile.cpp
     src/rts/states/loading_state.cpp
     src/rts/states/main_menu.cpp
     src/rts/states/state.cpp
     src/rts/state_stack.cpp
     src/rts/states/title_state.cpp
-    src/rts/states/game/command.cpp
-    src/rts/states/game/command_list.cpp
-    src/rts/states/game/tile.cpp
-    src/rts/states/game/lobby.cpp
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})

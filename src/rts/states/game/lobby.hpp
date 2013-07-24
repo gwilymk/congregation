@@ -5,6 +5,8 @@
 #include <SFML/System/Time.hpp>
 #include <memory>
 
+#include "rts/network/server_info.hpp"
+
 namespace sfg
 {
     class Desktop;
@@ -29,6 +31,9 @@ namespace rts
                     void create_server();
                     void update(sf::Time dt);
 
+                    bool server();
+                    network::ServerInfo get_server_info();
+
                 private:
                     void server_update(sf::Time dt);
                     void client_update(sf::Time dt);
@@ -37,7 +42,7 @@ namespace rts
                     bool *m_done;
                     std::unique_ptr<Impl> m_impl;
 
-                    bool server;
+                    bool m_server;
             };
         }
     }

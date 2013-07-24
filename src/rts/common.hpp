@@ -11,6 +11,8 @@
 
 namespace rts
 {
+    const int VERSION = 1;
+
     namespace assert
     {
         void fail(const char *code, const char *file, int line);

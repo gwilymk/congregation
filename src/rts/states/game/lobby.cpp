@@ -52,12 +52,14 @@ namespace rts
 
                 sf::UdpSocket broadcast_socket;
                 sfg::Desktop *desktop;
+
+                network::ServerInfo info;
             };
 
             Lobby::Lobby(bool *done):
                 m_done(done),
                 m_impl(new Impl),
-                server(false)
+                m_server(false)
             {
                 *m_done = false;
                 m_impl->broadcast_socket.setBlocking(false);
@@ -101,18 +103,17 @@ namespace rts
                 create->GetSignal(sfg::Button::OnLeftClick).Connect(&Lobby::create_server, this);
                 vbox->Pack(create, false, true);
 
-                m_impl->map_size->AppendItem("Small");
-                m_impl->map_size->AppendItem("Medium");
-                m_impl->map_size->AppendItem("Large");
+                for(std::string name : network::sizes)
+                    m_impl->map_size->AppendItem(name);
 
-                for(int i = 2 ; i <= 8 ; ++i) {
+                for(int i = 2 ; i <= network::max_players ; ++i)
                     m_impl->num_players->AppendItem(number_to_string(i));
-                }
 
                 notebook->AppendPage(vbox, sfg::Label::Create("Create Server"));
 
                 m_impl->desktop = &desktop;
                 desktop.Add(m_impl->window);
+                update_server_list();
             }
 
             void Lobby::update_server_list()
@@ -129,15 +130,44 @@ namespace rts
             void Lobby::create_server()
             {
                 assert(!*m_done);
-                server = true;
-                m_impl->broadcast_socket.bind(broadcast_port);
+
+                sf::String num_players_str = m_impl->num_players->GetSelectedText();
+                if(num_players_str.isEmpty()) 
+                    return;
+                    
+                int num_players = std::stoi(num_players_str.toAnsiString());
+                m_impl->info.max_players = num_players;
+
+                sf::String map_size_str = m_impl->map_size->GetSelectedText();
+                if(map_size_str.isEmpty())
+                    return;
+
+                for(unsigned int i = 0; i < network::sizes.size(); ++i) {
+                    if(network::sizes[i] == map_size_str) {
+                        m_impl->info.map_size = i;
+                        break;
+                    } 
+                }
+
+                m_impl->info.num_players = 1;
+
+                m_server = true;
+                *m_done = true;
+            }
+
+            bool Lobby::server()
+            {
+                return m_server;
+            }
+
+            network::ServerInfo Lobby::get_server_info()
+            {
+                return m_impl->info;
             }
 
             void Lobby::update(sf::Time dt)
             {
-                if(server) {
-                    server_update(dt);
-                } else {
+                if(!m_server) {
                     client_update(dt); 
                 }
             }
