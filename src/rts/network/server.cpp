@@ -61,7 +61,8 @@ namespace rts
                 std::cerr << command << std::endl;
                 if(command == want_info) {
                     reply << m_info;
-                    assert(c->send(packet) == sf::Socket::Done);
+                    assert(c->send(reply) == sf::Socket::Done);
+                    c->disconnect();
                 } else if(command == want_connection) {
                     m_impl->client_list.push_back(std::move(c));
                     m_info.num_players = m_impl->client_list.size();

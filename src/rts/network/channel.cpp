@@ -42,7 +42,10 @@ namespace rts
             } else if(m_peers.empty()) {
                 sf::Packet packet;
                 if(m_server_socket.receive(packet) == sf::Socket::Done) {
-                    packet >> m_server_info;
+                    std::string command;
+                    packet >> command;
+                    if(command == info_update)
+                        packet >> m_server_info;
                 }
             }
         }

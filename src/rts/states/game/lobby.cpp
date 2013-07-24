@@ -238,7 +238,7 @@ namespace rts
 
                         assert(request_socket.connect(addr, network::listen_port) == sf::Socket::Done);
                         sf::Packet query;
-                        query << network::want_connection;
+                        query << network::want_info;
                         assert(request_socket.send(query) == sf::Socket::Done);
                         assert(request_socket.receive(packet) == sf::Socket::Done);
                         assert(packet >> info);
