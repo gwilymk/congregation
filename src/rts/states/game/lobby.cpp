@@ -4,6 +4,7 @@
 #include <SFGUI/SFGUI.hpp>
 #include <SFML/Network.hpp>
 #include <string>
+#include <sstream>
 
 #include <iostream>
 
@@ -12,6 +13,14 @@ namespace
     const char *has_server_message = "server?\0";
     const std::size_t message_size = 8;
     const unsigned short broadcast_port = 10037;
+
+    template <typename T>
+    std::string number_to_string(T Number)
+    {
+        std::ostringstream ss;
+        ss << Number;
+        return ss.str();
+    }
 }
 
 namespace rts
@@ -105,7 +114,7 @@ namespace rts
                 m_impl->map_size->AppendItem("Large");
 
                 for(int i = 2 ; i <= 8 ; ++i) {
-                    m_impl->num_players->AppendItem(std::to_string(i));
+                    m_impl->num_players->AppendItem(number_to_string(i));
                 }
 
                 notebook->AppendPage(vbox, sfg::Label::Create("Create Server"));
