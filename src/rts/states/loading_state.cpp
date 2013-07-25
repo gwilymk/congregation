@@ -39,7 +39,7 @@ namespace rts
             m_lua_state.set_global("rts");
         }
 
-        bool LoadingState::update(sf::Time dt)
+        bool LoadingState::update(sf::Time)
         {
             m_lua_state.run_file("../res/init.lua");
             request_stack_pop();
@@ -51,7 +51,7 @@ namespace rts
         {
         }
 
-        bool LoadingState::handle_event(const sf::Event &event)
+        bool LoadingState::handle_event(const sf::Event &)
         {
             return true;
         }

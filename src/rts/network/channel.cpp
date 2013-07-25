@@ -7,12 +7,14 @@ namespace rts
 {
     namespace network
     {
-        Channel::Channel():
+        Channel::Channel(bool *done):
             m_listener(),
             m_accepting(false),
+            m_done(done),
             m_my_player(149)
         {
             m_listener.setBlocking(false);
+            *m_done = false;
         }
 
         Channel::~Channel()
@@ -45,11 +47,7 @@ namespace rts
         void Channel::update()
         {
             if(m_accepting) {
-                std::unique_ptr<sf::TcpSocket> s(new sf::TcpSocket());
-                if(m_listener.accept(*s) == sf::Socket::Done) {
-                    std::cerr << "Got peer " << s->getRemoteAddress().toString() << std::endl;
-                    m_peers.push_back(std::move(s));
-                }
+                get_peer();
             } 
             
             sf::Packet packet;
@@ -63,8 +61,15 @@ namespace rts
                 } else if(command == start_game) {
                     packet >> m_my_player;
                     std::cerr << "I am player: " << (unsigned) m_my_player << std::endl;
+                    for(int i = 0; i < seed_size; ++i)
+                        packet >> m_seed[i];
                     m_server_socket.disconnect();
-                    m_listener.close();
+                    while(num_players() != max_players()) {
+                        m_listener.setBlocking(true);
+                        get_peer();
+                    }
+                    stop_accepting_peers();
+                    *m_done = true;
                 } else if(command == new_peer) {
                     sf::Uint32 address;
                     packet >> address;
@@ -83,6 +88,15 @@ namespace rts
         int Channel::max_players()
         {
             return m_server_info.max_players;
+        }
+
+        void Channel::get_peer()
+        {
+            std::unique_ptr<sf::TcpSocket> s(new sf::TcpSocket());
+            if(m_listener.accept(*s) == sf::Socket::Done) {
+                std::cerr << "Got peer " << s->getRemoteAddress().toString() << std::endl;
+                m_peers.push_back(std::move(s));
+            }
         }
 
         void Channel::stop_accepting_peers()

@@ -18,24 +18,31 @@ namespace rts
         class Channel : private sf::NonCopyable
         {
             public:
-                Channel();
+                explicit Channel(bool *done);
                 ~Channel();
 
                 void connect_to_server(const sf::IpAddress &server_address, unsigned short port);
                 void add_peer(const sf::IpAddress &peer_address, unsigned short port);
 
                 void update();
+                int num_players();
+                int max_players();
+
+                sf::Uint32 get_seed();
+
+            private:
                 void start_accepting_peers();
                 void stop_accepting_peers();
 
-                int num_players();
-                int max_players();
+                void get_peer();
 
             private:
                 sf::TcpListener m_listener;
                 sf::TcpSocket m_server_socket;
                 bool m_accepting;
+                bool *m_done;
                 sf::Uint8 m_my_player;
+                sf::Uint32 m_seed[network::seed_size];
 
                 ServerInfo m_server_info;
 

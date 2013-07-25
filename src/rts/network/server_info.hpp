@@ -14,6 +14,7 @@ namespace rts
         const std::vector<std::string> sizes = { "Small", "Medium", "Large" };
         const sf::Uint8 map_sizes[] = { 32, 48, 64 };
         const int max_players = 8;
+        const int seed_size = 5;
 
         const std::string has_server_message = "server?";
         const std::string reply_message = "me!";

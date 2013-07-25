@@ -14,7 +14,7 @@ namespace rts
             m_desktop(),
             m_commands(5),
             m_server(nullptr),
-            m_channel(),
+            m_channel(&m_lobby_done),
             m_state(CurrentState::InLobby)
         {
             m_lobby = new game::Lobby(&m_lobby_done);
@@ -50,6 +50,8 @@ namespace rts
 
         bool GameState::handle_event(const sf::Event &event)
         {
+            if(event.type == sf::Event::Closed)
+                request_stack_pop();
             m_desktop.HandleEvent(event);
             return true;
         }
@@ -69,6 +71,7 @@ namespace rts
 
                 delete m_lobby;
                 m_lobby = nullptr;
+                m_lobby_done = false;
 
                 m_state = CurrentState::Waiting;
 
@@ -85,8 +88,15 @@ namespace rts
             }
         }
 
-        void GameState::waiting_update(sf::Time dt)
+        void GameState::waiting_update(sf::Time)
         {
+            if(m_lobby_done) {
+                delete m_server;
+                m_server = nullptr;
+                m_state = CurrentState::Playing;
+                return;
+            }
+
             if(m_server)
                 m_server->listen();
             m_channel.update();

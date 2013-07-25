@@ -3,6 +3,7 @@
 #include "rts/common.hpp"
 #include <vector>
 #include <memory>
+#include <random>
 
 #include <iostream>
 
@@ -12,6 +13,13 @@ namespace rts
     {
         struct Server::Impl
         {
+            Impl():
+                broadcast_socket(),
+                listener(),
+                client(),
+                client_list()
+            {}
+
             sf::UdpSocket broadcast_socket;
             sf::TcpListener listener;
             sf::TcpSocket client;
@@ -99,10 +107,17 @@ namespace rts
 
             if(!started && m_info.num_players == m_info.max_players) {
                 sf::Uint8 player_num = 0;
+                sf::Uint32 seed[seed_size];
+                std::random_device rd;
+                for(int i = 0; i < seed_size; ++i) 
+                    seed[i] = rd();
+
                 for(auto client = m_impl->client_list.begin() ; client != m_impl->client_list.end() ; ++client) {
                     sf::Packet message;
                     message << network::start_game;
                     message << player_num;
+                    for(int i = 0; i < seed_size; ++i) 
+                        message << seed[i];
                     ASSERT((*client)->send(message) == sf::Socket::Done);
                     ++player_num;
                 }
