@@ -23,7 +23,8 @@ load_resource = (filename) ->
 
 resource_files = {
     "textures/title.lua"
-    "fonts/font.lua",
+    "textures/tiles.lua"
+    "fonts/font.lua"
 }
 
 for res in *resource_files

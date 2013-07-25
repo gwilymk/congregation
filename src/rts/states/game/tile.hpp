@@ -12,10 +12,12 @@ namespace rts
         {
             struct Tile
             {
-                sf::Uint8 id;
-
                 enum Orientation : sf::Uint8 { NORTH, EAST, SOUTH, WEST };
+                Tile();
+                Tile(sf::Uint8 id, Orientation orientation);
+
                 Orientation orientation;
+                sf::Uint8 id;
             };
 
             sf::Packet &operator<<(sf::Packet &packet, const Tile &tile);

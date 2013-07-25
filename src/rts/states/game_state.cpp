@@ -8,6 +8,25 @@ namespace rts
 {
     namespace states
     {
+        void GameState::add_to_vertex_array(sf::VertexArray &array, const game::Tile &tile, int id)
+        {
+            int tx = id % m_size;
+            int ty = id / m_size;
+
+            int tu = tile.id % 8;
+            int tv = tile.id / 8;
+
+            array[id * 4 + 0].position = sf::Vector2f(128 * tx, 128 * ty);
+            array[id * 4 + 1].position = sf::Vector2f(128 * (tx + 1), 128 * ty);
+            array[id * 4 + 2].position = sf::Vector2f(128 * (tx + 1), 128 * (ty + 1));
+            array[id * 4 + 3].position = sf::Vector2f(128 * tx, 128 * (ty + 1));
+
+            array[id * 4 + (0 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * tu, 128 * tv);
+            array[id * 4 + (1 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * (tu + 1), 128 * tv);
+            array[id * 4 + (2 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * (tu + 1), 128 * (tv + 1));
+            array[id * 4 + (3 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * tu, 128 * (tv + 1));
+        }
+
         GameState::GameState(StateStack &stack, Context context):
             State(stack, context),
             m_lobby_done(false),
@@ -29,6 +48,15 @@ namespace rts
 
         void GameState::draw()
         {
+            if(m_state != CurrentState::Playing) return;
+
+            // draw tiles
+            sf::VertexArray array(sf::Quads, m_size * m_size * 4);
+            for(int i = 0; i < m_size * m_size; ++i) {
+                add_to_vertex_array(array, m_tiles[i], i);
+            }
+
+            get_context().window->draw(array, &get_context().texture_holder->get("tiles"));
         }
 
         bool GameState::update(sf::Time dt)
@@ -40,6 +68,9 @@ namespace rts
                     break;
                 case CurrentState::Waiting:
                     waiting_update(dt);
+                    break;
+                case CurrentState::SettingUp:
+                    setting_up_update(dt);
                     break;
                 case CurrentState::Playing:
                     playing_update(dt);
@@ -96,8 +127,10 @@ namespace rts
             if(m_lobby_done) {
                 delete m_server;
                 m_server = nullptr;
-                m_state = CurrentState::Playing;
+                m_state = CurrentState::SettingUp;
                 m_desktop.RemoveAll();
+                m_status_label.reset();
+                m_info = m_channel.get_server_info();
                 return;
             }
 
@@ -106,6 +139,28 @@ namespace rts
             std::ostringstream ss;
             ss << "Waiting for other players (" << m_channel.num_players() << '/' << m_channel.max_players() << ')';
             m_status_label->SetText(ss.str());
+        }
+
+        void GameState::setting_up_update(sf::Time)
+        {
+            std::array<sf::Uint32, network::seed_size> seed = m_channel.get_seed();
+            std::seed_seq seq(seed.begin(), seed.end());
+            m_random.seed(seq);
+
+            sf::Uint8 map_size = m_info.map_size;
+            m_size = network::map_sizes[map_size];
+
+            m_tiles.reserve(m_size * m_size);
+            std::geometric_distribution<sf::Uint8> grass_dist(0.75);
+            std::uniform_int_distribution<sf::Uint8> orientation_dist(game::Tile::Orientation::NORTH, game::Tile::Orientation::WEST);
+
+            for(int i = 0 ; i < m_size * m_size ; ++i) {
+                sf::Uint8 tileid = grass_dist(m_random);
+                if(tileid > 4) tileid = 4;
+                m_tiles[i] = game::Tile(tileid, (game::Tile::Orientation)orientation_dist(m_random));
+            }
+
+            m_state = CurrentState::Playing;
         }
 
         void GameState::playing_update(sf::Time)

@@ -6,6 +6,18 @@ namespace rts
     {
         namespace game
         {
+            Tile::Tile():
+                orientation(orientation),
+                id(0)
+            {
+            }
+
+            Tile::Tile(sf::Uint8 id, Orientation orientation):
+                orientation(orientation),
+                id(id)
+            {
+            }
+
             sf::Packet &operator<<(sf::Packet &packet, const Tile &tile)
             {
                 packet << tile.id;

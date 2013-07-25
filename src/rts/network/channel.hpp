@@ -8,6 +8,7 @@
 #include <SFML/Network/TcpListener.hpp>
 #include <SFML/Network/TcpSocket.hpp>
 #include <SFML/Network/IpAddress.hpp>
+#include <array>
 #include <vector>
 #include <memory>
 
@@ -30,7 +31,8 @@ namespace rts
                 sf::Socket::Status receive(sf::Packet &packet, sf::Uint8 &player);
                 sf::Socket::Status send(sf::Packet &packet);
 
-                sf::Uint32 get_seed();
+                std::array<sf::Uint32, network::seed_size> get_seed() const;
+                ServerInfo get_server_info() const;
 
             private:
                 void start_accepting_peers();
@@ -45,7 +47,7 @@ namespace rts
                 bool m_accepting;
                 bool *m_done;
                 sf::Uint8 m_my_player;
-                sf::Uint32 m_seed[network::seed_size];
+                std::array<sf::Uint32, network::seed_size> m_seed;
 
                 ServerInfo m_server_info;
 

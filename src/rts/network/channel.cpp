@@ -144,5 +144,15 @@ namespace rts
 
             return sf::Socket::Done;
         }
+
+        std::array<sf::Uint32, network::seed_size> Channel::get_seed() const
+        {
+            return m_seed;
+        }
+
+        ServerInfo Channel::get_server_info() const
+        {
+            return m_server_info;
+        }
     }
 }
