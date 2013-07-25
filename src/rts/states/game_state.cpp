@@ -225,6 +225,8 @@ namespace rts
 
         void GameState::update_input(sf::Time dt)
         {
+            if(!*get_context().focused)
+                return;
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::K))
                 m_view.move(0, -dt.asSeconds() * 128.0 * move_speed);
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::H))

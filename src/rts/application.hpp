@@ -31,6 +31,7 @@ namespace rts
             holders::TextureHolder m_texture_holder;
             holders::FontHolder m_font_holder;
             holders::ShaderHolder m_shader_holder;
+            bool m_focused;
             StateStack m_state_stack;
     };
 }

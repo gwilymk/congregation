@@ -21,7 +21,8 @@ namespace rts
         m_texture_holder(),
         m_font_holder(),
         m_shader_holder(),
-        m_state_stack(states::State::Context(m_render_window, m_texture_holder, m_font_holder, m_shader_holder))
+        m_focused(true),
+        m_state_stack(states::State::Context(m_render_window, m_texture_holder, m_font_holder, m_shader_holder, m_focused))
     {
         m_render_window.setVerticalSyncEnabled(true);
         m_render_window.resetGLStates();
@@ -82,7 +83,16 @@ namespace rts
     {
         sf::Event event;
         while(m_render_window.pollEvent(event)) {
-            m_state_stack.handle_event(event); 
+            switch(event.type) {
+                case sf::Event::LostFocus:
+                    m_focused = false;
+                    break;
+                case sf::Event::GainedFocus:
+                    m_focused = true;
+                    break;
+                default: 
+                    m_state_stack.handle_event(event); 
+            }
         }
     }
 
