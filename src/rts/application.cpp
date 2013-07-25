@@ -20,7 +20,8 @@ namespace rts
         m_render_window(sf::VideoMode(800, 600), "rts"),
         m_texture_holder(),
         m_font_holder(),
-        m_state_stack(states::State::Context(m_render_window, m_texture_holder, m_font_holder))
+        m_shader_holder(),
+        m_state_stack(states::State::Context(m_render_window, m_texture_holder, m_font_holder, m_shader_holder))
     {
         m_render_window.setVerticalSyncEnabled(true);
         m_render_window.resetGLStates();

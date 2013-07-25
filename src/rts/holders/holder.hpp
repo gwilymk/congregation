@@ -4,6 +4,7 @@
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -30,6 +31,7 @@ namespace rts
 
         typedef Holder<sf::Texture> TextureHolder;
         typedef Holder<sf::Font> FontHolder;
+        typedef Holder<sf::Shader> ShaderHolder;
     }
 }
 

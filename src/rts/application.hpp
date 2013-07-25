@@ -30,6 +30,7 @@ namespace rts
             sf::RenderWindow m_render_window;
             holders::TextureHolder m_texture_holder;
             holders::FontHolder m_font_holder;
+            holders::ShaderHolder m_shader_holder;
             StateStack m_state_stack;
     };
 }

@@ -26,11 +26,12 @@ namespace rts
                 typedef std::unique_ptr<State> ptr;
 
                 struct Context {
-                    Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder);
+                    Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder, holders::ShaderHolder &shader_holder);
 
                     sf::RenderWindow *window;
                     holders::TextureHolder *texture_holder;
                     holders::FontHolder *font_holder;
+                    holders::ShaderHolder *shader_holder;
                 };
 
             public:

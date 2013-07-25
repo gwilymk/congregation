@@ -7,6 +7,30 @@
 namespace
 {
     const float move_speed = 5.0;
+
+    const float s = 0.8, v = 0.8;
+    
+    sf::Color get_colour(float h)
+    {
+        h -= (long int)h;
+
+        int h_i = h * 6;
+        float f = h * 6.0 - h_i;
+        float p = v * (1 - s);
+        float q = v * (1 - f * s);
+        float t = v * (1 - (1 - f) * s);
+
+        float r = 0.0, g = 0.0, b = 0.0;
+        
+        if(h_i == 0) { r = v; g = t; b = p; }
+        if(h_i == 1) { r = q; g = v; b = p; }
+        if(h_i == 2) { r = p; g = v; b = t; }
+        if(h_i == 3) { r = p; g = q; b = v; }
+        if(h_i == 4) { r = t; g = p; b = v; }
+        if(h_i == 5) { r = v; g = p; b = q; }
+
+        return  sf::Color(r * 256, g * 256, b * 256);
+    }
 }
 
 namespace rts
@@ -174,9 +198,18 @@ namespace rts
 
             std::uniform_int_distribution<sf::Uint16> pos_dist(0, m_size * 128);
 
-            for(int i = 0; i < 500; ++i) {
-                create_minion(pos_dist(m_random), pos_dist(m_random));
+            std::uniform_real_distribution<float> colour_dist(0, 1);
+            float h = colour_dist(m_random);
+            m_player_colours.reserve(m_info.max_players);
+            for(int i = 0; i < m_info.max_players; ++i) {
+                m_player_colours[i] = get_colour(h);
+                h += 0.618033;
+                h -= (int)h;
             }
+
+            std::uniform_int_distribution<sf::Uint8> player_dist(0, m_info.max_players - 1);
+            for(int i = 0; i < 500; ++i) 
+                create_minion(pos_dist(m_random), pos_dist(m_random), player_dist(m_random));
         }
 
         void GameState::playing_update(sf::Time dt)
@@ -202,13 +235,10 @@ namespace rts
                 m_view.move(dt.asSeconds() * 128.0 * move_speed, 0);
         }
 
-        void GameState::create_minion(sf::Uint16 x, sf::Uint16 y)
+        void GameState::create_minion(sf::Uint16 x, sf::Uint16 y, sf::Uint8 player_num)
         {
-            std::uniform_int_distribution<sf::Uint8> move_dist(0, 3);
             std::uniform_int_distribution<sf::Uint8> hat_dist(0, 8);
-            game::Minion minion(hat_dist(m_random), sf::Color::Black, x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"));
-            minion.set_moving(true);
-            minion.set_direction(move_dist(m_random));
+            game::Minion minion(hat_dist(m_random), m_player_colours[player_num], x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"), &get_context().shader_holder->get("minion"));
             m_minions.push_back(minion);
         }
     }

@@ -7,6 +7,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 #include <SFML/Config.hpp>
 
@@ -21,7 +22,7 @@ namespace rts
                 public:
                     enum { NO_HAT = 254 };
 
-                    Minion(sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture);
+                    Minion(sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader);
 
                     void update(sf::Time dt);
 
@@ -50,6 +51,7 @@ namespace rts
                     
                     sf::Texture *m_texture;
                     sf::Texture *m_hat_texture;
+                    sf::Shader *m_shader;
             };
         }
     }

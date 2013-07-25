@@ -36,6 +36,19 @@ namespace rts
             });
             m_lua_state.set_field(-2, "load_font");
 
+            m_lua_state.push<std::function<int(lua_State *)>>(
+            [this] (lua_State *L_raw) -> int {
+                lua::State L(L_raw);
+                ASSERT(L.get_top() == 3);
+                std::string name = L.get<std::string>(1);
+                std::string vert = L.get<std::string>(2);
+                std::string frag = L.get<std::string>(3);
+
+                get_context().shader_holder->load(name, vert, frag);
+                return 0;
+            });
+            m_lua_state.set_field(-2, "load_shader");
+
             m_lua_state.set_global("rts");
         }
 

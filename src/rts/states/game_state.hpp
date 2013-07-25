@@ -41,7 +41,7 @@ namespace rts
 
                 void add_to_vertex_array(sf::VertexArray &array, const game::Tile &tile, int id);
 
-                void create_minion(sf::Uint16 x, sf::Uint16 y);
+                void create_minion(sf::Uint16 x, sf::Uint16 y, sf::Uint8 player_num);
 
             private:
                 bool m_lobby_done;
@@ -61,6 +61,7 @@ namespace rts
                 int m_size;
                 std::vector<game::Tile> m_tiles;
                 std::vector<game::Minion> m_minions;
+                std::vector<sf::Color> m_player_colours;
                 std::set<int> m_free_list;
                 std::mt19937 m_random;
 
