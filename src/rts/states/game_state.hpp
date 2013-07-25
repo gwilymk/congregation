@@ -35,6 +35,7 @@ namespace rts
                 void lobby_update(sf::Time dt);
                 void waiting_update(sf::Time dt);
                 void playing_update(sf::Time dt);
+                void update_input(sf::Time dt);
                 void setting_up_update(sf::Time dt);
 
                 void add_to_vertex_array(sf::VertexArray &array, const game::Tile &tile, int id);
@@ -49,13 +50,16 @@ namespace rts
                 network::Channel m_channel;
                 network::ServerInfo m_info;
 
-                int m_size;
 
                 CurrentState m_state;
 
                 sfg::Label::Ptr m_status_label;
+
+                int m_size;
                 std::vector<game::Tile> m_tiles;
                 std::mt19937 m_random;
+
+                sf::View m_view;
         };
     }
 }

@@ -4,6 +4,11 @@
 
 #include <SFGUI/SFGUI.hpp>
 
+namespace
+{
+    const float move_speed = 5.0;
+}
+
 namespace rts
 {
     namespace states
@@ -38,6 +43,8 @@ namespace rts
         {
             m_lobby = new game::Lobby(&m_lobby_done);
             m_lobby->add_to_desktop(m_desktop);
+
+            m_view = get_context().window->getView();
         }
 
         GameState::~GameState()
@@ -163,8 +170,23 @@ namespace rts
             m_state = CurrentState::Playing;
         }
 
-        void GameState::playing_update(sf::Time)
+        void GameState::playing_update(sf::Time dt)
         {
+            update_input(dt);
+
+            get_context().window->setView(m_view);
+        }
+
+        void GameState::update_input(sf::Time dt)
+        {
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+                m_view.move(0, -dt.asSeconds() * 128.0 * move_speed);
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::H))
+                m_view.move(-dt.asSeconds() * 128.0 * move_speed, 0);
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::J))
+                m_view.move(0, dt.asSeconds() * 128.0 * move_speed);
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::L))
+                m_view.move(dt.asSeconds() * 128.0 * move_speed, 0);
         }
     }
 }
