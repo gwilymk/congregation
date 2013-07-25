@@ -14,7 +14,7 @@ namespace rts
                 throw std::runtime_error("Failed to load resource: " + filename);
 
             auto inserted = m_resource_map.insert(std::make_pair(name, std::move(resource)));
-            assert(inserted.second);
+            ASSERT(inserted.second);
         }
 
         template <class Resource>
@@ -25,14 +25,14 @@ namespace rts
                 throw std::runtime_error("Failed to load resource: " + filename);
 
             auto inserted = m_resource_map.insert(std::make_pair(name, std::move(resource)));
-            assert(inserted.second);
+            ASSERT(inserted.second);
         }
 
         template <class Resource>
         Resource &Holder<Resource>::get(const std::string &name)
         {
             auto found = m_resource_map.find(name);
-            assert(found != m_resource_map.end());
+            ASSERT(found != m_resource_map.end());
 
             return *found->second;
         }
@@ -41,7 +41,7 @@ namespace rts
         const Resource &Holder<Resource>::get(const std::string &name) const
         {
             auto found = m_resource_map.find(name);
-            assert(found != m_resource_map.end());
+            ASSERT(found != m_resource_map.end());
 
             return *found->second;
         }

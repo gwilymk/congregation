@@ -62,9 +62,9 @@ namespace rts
             if(m_lobby_done) {
                 if(m_lobby->server()) {
                     m_server = new network::Server(m_lobby->get_server_info());
-                    m_channel.connect_to_server(sf::IpAddress::LocalHost);
+                    m_channel.connect_to_server(sf::IpAddress::LocalHost, m_server->port());
                 } else
-                    m_channel.connect_to_server(m_lobby->get_server());
+                    m_channel.connect_to_server(m_lobby->get_server(), m_lobby->get_server_port());
 
 
                 delete m_lobby;

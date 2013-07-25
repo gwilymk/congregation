@@ -21,8 +21,8 @@ namespace rts
                 Channel();
                 ~Channel();
 
-                void connect_to_server(const sf::IpAddress &server_address);
-                void add_peer(const sf::IpAddress &peer_address);
+                void connect_to_server(const sf::IpAddress &server_address, unsigned short port);
+                void add_peer(const sf::IpAddress &peer_address, unsigned short port);
 
                 void update();
                 void start_accepting_peers();
@@ -35,6 +35,7 @@ namespace rts
                 sf::TcpListener m_listener;
                 sf::TcpSocket m_server_socket;
                 bool m_accepting;
+                sf::Uint8 m_my_player;
 
                 ServerInfo m_server_info;
 

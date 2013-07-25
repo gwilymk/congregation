@@ -15,7 +15,7 @@ namespace rts
             m_lua_state.push<std::function<int(lua_State *)>>(
             [this] (lua_State *L_raw) -> int {
                 lua::State L(L_raw);
-                assert(L.get_top() == 2);
+                ASSERT(L.get_top() == 2);
                 std::string name = L.get<std::string>(1);
                 std::string fname = L.get<std::string>(2);
 
@@ -27,7 +27,7 @@ namespace rts
             m_lua_state.push<std::function<int(lua_State *)>>(
             [this] (lua_State *L_raw) -> int {
                 lua::State L(L_raw);
-                assert(L.get_top() == 2);
+                ASSERT(L.get_top() == 2);
                 std::string name = L.get<std::string>(1);
                 std::string fname = L.get<std::string>(2);
 

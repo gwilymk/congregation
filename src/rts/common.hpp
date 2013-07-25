@@ -1,7 +1,7 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#define assert(x) \
+#define ASSERT(x) \
     do { if(!(x)) { rts::assert::fail(#x, __FILE__, __LINE__); } } while(__LINE__ == -1)
 
 namespace rts

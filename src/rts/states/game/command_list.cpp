@@ -29,7 +29,7 @@ namespace rts
             Command CommandList::get_command()
             {
                 auto itr = m_commands.begin();
-                assert(itr->turn >= m_current_turn);
+                ASSERT(itr->turn >= m_current_turn);
 
                 if(itr->turn != m_current_turn)
                     return Command();

@@ -72,7 +72,7 @@ namespace rts
                 sf::UdpSocket broadcast_socket;
                 sfg::Desktop *desktop;
 
-                std::vector<sf::IpAddress> servers;
+                std::vector<std::pair<sf::IpAddress, unsigned short>> servers;
                 std::vector<std::unique_ptr<ButtonCallback>> callbacks;
 
                 network::ServerInfo info;
@@ -233,10 +233,12 @@ namespace rts
                     network::ServerInfo info;
                     packet >> message;
                     if(message == network::reply_message) {
-                        std::cerr << "Found server: " << addr.toString() << ":" << port << std::endl;
+                        sf::Uint16 tcp_port;
+                        packet >> tcp_port;
+                        std::cerr << "Found server: " << addr.toString() << ":" << tcp_port << std::endl;
                         sf::TcpSocket request_socket;
 
-                        assert(request_socket.connect(addr, network::listen_port) == sf::Socket::Done);
+                        assert(request_socket.connect(addr, tcp_port) == sf::Socket::Done);
                         sf::Packet query;
                         query << network::want_info;
                         assert(request_socket.send(query) == sf::Socket::Done);
@@ -244,7 +246,7 @@ namespace rts
                         assert(packet >> info);
                         request_socket.disconnect();
 
-                        m_impl->servers.push_back(addr);
+                        m_impl->servers.push_back(std::make_pair(addr, tcp_port));
                         std::ostringstream ss;
                         ss << addr.toString() << ' ' << (unsigned) info.num_players << '/' << (unsigned) info.max_players << " (" << network::sizes.at(info.map_size) << ")";
                         sfg::Button::Ptr b = sfg::Button::Create(ss.str());
@@ -259,7 +261,12 @@ namespace rts
 
             sf::IpAddress Lobby::get_server() const
             {
-                return m_impl->servers[m_serverid];
+                return m_impl->servers[m_serverid].first;
+            }
+
+            unsigned short Lobby::get_server_port() const
+            {
+                return m_impl->servers[m_serverid].second;
             }
 
             void Lobby::set_server(int serverid)

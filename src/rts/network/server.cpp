@@ -21,16 +21,22 @@ namespace rts
 
         Server::Server(const ServerInfo &info):
             m_info(info),
-            m_impl(new Impl())
+            m_impl(new Impl()),
+            started(false)
         {
             m_impl->broadcast_socket.setBlocking(false);
             m_impl->listener.setBlocking(false);
             m_impl->broadcast_socket.bind(network::broadcast_port);
-            m_impl->listener.listen(network::listen_port);
+            m_impl->listener.listen(sf::Socket::AnyPort);
         }
 
         Server::~Server()
         {
+        }
+
+        unsigned short Server::port()
+        {
+            return m_impl->listener.getLocalPort();
         }
 
         void Server::listen()
@@ -45,7 +51,8 @@ namespace rts
                     std::cerr << "Yay! " << addr.toString() << ":" << port << std::endl;
                     sf::Packet reply;
                     reply << network::reply_message;
-                    assert(m_impl->broadcast_socket.send(reply, addr, port) == sf::Socket::Done);
+                    reply << m_impl->listener.getLocalPort();
+                    ASSERT(m_impl->broadcast_socket.send(reply, addr, port) == sf::Socket::Done);
                 }
             }
 
@@ -56,29 +63,63 @@ namespace rts
                 std::string command;
                 c->receive(packet);
                 packet >> command;
-                sf::Packet reply;
 
-                std::cerr << command << std::endl;
+                std::cerr << "Server got command: " << command << std::endl;
                 if(command == want_info) {
+                    sf::Packet reply;
                     reply << m_info;
-                    assert(c->send(reply) == sf::Socket::Done);
+                    ASSERT(c->send(reply) == sf::Socket::Done);
                     c->disconnect();
                 } else if(command == want_connection) {
+                    sf::Uint16 port;
+                    packet >> port;
+                    new_peer(c->getRemoteAddress(), port);
+
+                    c->setBlocking(false);
                     m_impl->client_list.push_back(std::move(c));
                     m_info.num_players = m_impl->client_list.size();
-                 
-                    update_info();
+                } else {
+                    ASSERT(false);
                 }
+            }
+
+            packet.clear();
+            for(auto client = m_impl->client_list.begin() ; client != m_impl->client_list.end() ; ++client) {
+                if((*client)->receive(packet) == sf::Socket::Done) {
+                    std::string command;
+                    packet >> command;
+                    if(command == want_info) {
+                        sf::Packet reply;
+                        reply << info_update;
+                        reply << m_info;
+                        ASSERT((*client)->send(reply) == sf::Socket::Done);
+                    }
+                }
+            }
+
+            if(!started && m_info.num_players == m_info.max_players) {
+                sf::Uint8 player_num = 0;
+                for(auto client = m_impl->client_list.begin() ; client != m_impl->client_list.end() ; ++client) {
+                    sf::Packet message;
+                    message << network::start_game;
+                    message << player_num;
+                    ASSERT((*client)->send(message) == sf::Socket::Done);
+                    ++player_num;
+                }
+
+                started = true;
             }
         }
 
-        void Server::update_info()
+        void Server::new_peer(const sf::IpAddress &address, sf::Uint16 port_num)
         {
-            sf::Packet message;
-            message << network::info_update << m_info;
+            sf::Packet packet;
+            packet << network::new_peer;
+            packet << address.toInteger() << port_num;
+            packet << network::new_peer;
 
             for(auto client = m_impl->client_list.begin() ; client != m_impl->client_list.end() ; ++client) {
-                assert((*client)->send(message) == sf::Socket::Done);
+                ASSERT((*client)->send(packet) == sf::Socket::Done);
             }
         }
     }

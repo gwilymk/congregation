@@ -2,6 +2,7 @@
 #define SERVER_HPP
 
 #include <SFML/System/NonCopyable.hpp>
+#include <SFML/Network/IpAddress.hpp>
 
 #include "rts/network/server_info.hpp"
 #include <memory>
@@ -19,13 +20,15 @@ namespace rts
                 ~Server();
 
                 void listen();
+                unsigned short port();
 
             private:
-                void update_info();
+                void new_peer(const sf::IpAddress &address, sf::Uint16 port);
 
             private:
                 ServerInfo m_info;
                 std::unique_ptr<Impl> m_impl;
+                bool started;
         };
     }
 }

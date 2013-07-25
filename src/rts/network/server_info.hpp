@@ -20,10 +20,11 @@ namespace rts
         const std::string want_info = "info please";
         const std::string want_connection = "connection please";
         const std::string info_update = "info update";
+        const std::string start_game = "start game!";
+        const std::string new_peer = "new peer";
 
         const unsigned short broadcast_port = 10037;
         const unsigned short listen_port = 10038;
-        const unsigned short peer_listen_port = 10039;
 
         struct ServerInfo
         {

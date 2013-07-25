@@ -38,6 +38,7 @@ namespace rts
                     network::ServerInfo get_server_info() const;
 
                     sf::IpAddress get_server() const;
+                    unsigned short get_server_port() const;
 
                 private:
                     void server_update(sf::Time dt);

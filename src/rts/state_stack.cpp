@@ -12,7 +12,7 @@ namespace rts
     states::State::ptr StateStack::create_state(states::ID stateID)
     {
         auto found = m_factories.find(stateID);
-        assert(found != m_factories.end());
+        ASSERT(found != m_factories.end());
 
         return found->second();
     }

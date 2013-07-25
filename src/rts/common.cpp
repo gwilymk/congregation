@@ -8,7 +8,7 @@ namespace rts
     {
         void fail(const char *code, const char *file, int line)
         {
-            std::printf("Assertion failed (%s:%i) %s\n", file, line, code);
+            std::fprintf(stderr, "Assertion failed (%s:%i) %s\n", file, line, code);
             std::exit(1);
         }
     }

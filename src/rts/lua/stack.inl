@@ -103,7 +103,7 @@ namespace rts
                 function_list *list = (function_list *) lua_touserdata(L, -1);
                 lua_pop(L, 1);
                 auto ret = list->insert(std::make_pair(list->size(), val));
-                assert(ret.second);
+                ASSERT(ret.second);
 
                 lua_pushlightuserdata(L, &(ret.first->second));
                 lua_pushcclosure(L, &lua_function_call, 1);
