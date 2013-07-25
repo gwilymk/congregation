@@ -64,6 +64,9 @@ namespace rts
             }
 
             get_context().window->draw(array, &get_context().texture_holder->get("tiles"));
+
+            for(auto &minion : m_minions)
+                get_context().window->draw(minion);
         }
 
         bool GameState::update(sf::Time dt)
@@ -159,7 +162,7 @@ namespace rts
 
             m_tiles.reserve(m_size * m_size);
             std::geometric_distribution<sf::Uint8> grass_dist(0.75);
-            std::uniform_int_distribution<sf::Uint8> orientation_dist(game::Tile::Orientation::NORTH, game::Tile::Orientation::WEST);
+            std::uniform_int_distribution<sf::Uint8> orientation_dist(game::Tile::Orientation::NORTH, game::Tile::Orientation::WEST + 1);
 
             for(int i = 0 ; i < m_size * m_size ; ++i) {
                 sf::Uint8 tileid = grass_dist(m_random);
@@ -168,11 +171,21 @@ namespace rts
             }
 
             m_state = CurrentState::Playing;
+
+            std::uniform_int_distribution<sf::Uint16> pos_dist(0, m_size * 128);
+
+            for(int i = 0; i < 500; ++i) {
+                create_minion(pos_dist(m_random), pos_dist(m_random));
+            }
         }
 
         void GameState::playing_update(sf::Time dt)
         {
             update_input(dt);
+
+            for(auto &minion : m_minions) {
+                minion.update(dt);
+            }
 
             get_context().window->setView(m_view);
         }
@@ -187,6 +200,16 @@ namespace rts
                 m_view.move(0, dt.asSeconds() * 128.0 * move_speed);
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::L))
                 m_view.move(dt.asSeconds() * 128.0 * move_speed, 0);
+        }
+
+        void GameState::create_minion(sf::Uint16 x, sf::Uint16 y)
+        {
+            std::uniform_int_distribution<sf::Uint8> move_dist(0, 3);
+            std::uniform_int_distribution<sf::Uint8> hat_dist(0, 8);
+            game::Minion minion(hat_dist(m_random), sf::Color::Black, x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"));
+            minion.set_moving(true);
+            minion.set_direction(move_dist(m_random));
+            m_minions.push_back(minion);
         }
     }
 }

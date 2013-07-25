@@ -4,6 +4,7 @@
 #include "rts/states/state.hpp"
 #include "rts/states/game/command_list.hpp"
 #include "rts/states/game/tile.hpp"
+#include "rts/states/game/minion.hpp"
 #include "rts/network/channel.hpp"
 #include "rts/network/server_info.hpp"
 
@@ -40,6 +41,8 @@ namespace rts
 
                 void add_to_vertex_array(sf::VertexArray &array, const game::Tile &tile, int id);
 
+                void create_minion(sf::Uint16 x, sf::Uint16 y);
+
             private:
                 bool m_lobby_done;
                 
@@ -57,6 +60,8 @@ namespace rts
 
                 int m_size;
                 std::vector<game::Tile> m_tiles;
+                std::vector<game::Minion> m_minions;
+                std::set<int> m_free_list;
                 std::mt19937 m_random;
 
                 sf::View m_view;

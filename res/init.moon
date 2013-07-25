@@ -24,6 +24,8 @@ load_resource = (filename) ->
 resource_files = {
     "textures/title.lua"
     "textures/tiles.lua"
+    "textures/minion.lua"
+    "textures/hats.lua"
     "fonts/font.lua"
 }
 
