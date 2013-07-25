@@ -42,6 +42,7 @@ namespace rts
                     waiting_update(dt);
                     break;
                 case CurrentState::Playing:
+                    playing_update(dt);
                     break;
             }
 
@@ -52,6 +53,7 @@ namespace rts
         {
             if(event.type == sf::Event::Closed)
                 request_stack_pop();
+
             m_desktop.HandleEvent(event);
             return true;
         }
@@ -64,6 +66,7 @@ namespace rts
             if(m_lobby_done) {
                 if(m_lobby->server()) {
                     m_server = new network::Server(m_lobby->get_server_info());
+                    m_server->listen();
                     m_channel.connect_to_server(sf::IpAddress::LocalHost, m_server->port());
                 } else
                     m_channel.connect_to_server(m_lobby->get_server(), m_lobby->get_server_port());
@@ -94,16 +97,19 @@ namespace rts
                 delete m_server;
                 m_server = nullptr;
                 m_state = CurrentState::Playing;
+                m_desktop.RemoveAll();
                 return;
             }
 
-            if(m_server)
-                m_server->listen();
             m_channel.update();
 
             std::ostringstream ss;
             ss << "Waiting for other players (" << m_channel.num_players() << '/' << m_channel.max_players() << ')';
             m_status_label->SetText(ss.str());
+        }
+
+        void GameState::playing_update(sf::Time)
+        {
         }
     }
 }

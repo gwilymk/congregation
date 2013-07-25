@@ -22,17 +22,20 @@ namespace rts
                 ~Channel();
 
                 void connect_to_server(const sf::IpAddress &server_address, unsigned short port);
-                void add_peer(const sf::IpAddress &peer_address, unsigned short port);
 
                 void update();
                 int num_players();
                 int max_players();
+
+                sf::Socket::Status receive(sf::Packet &packet, sf::Uint8 &player);
+                sf::Socket::Status send(sf::Packet &packet);
 
                 sf::Uint32 get_seed();
 
             private:
                 void start_accepting_peers();
                 void stop_accepting_peers();
+                void add_peer(const sf::IpAddress &peer_address, unsigned short port, sf::Uint8 player_num);
 
                 void get_peer();
 
@@ -46,7 +49,7 @@ namespace rts
 
                 ServerInfo m_server_info;
 
-                std::vector<std::unique_ptr<sf::TcpSocket>> m_peers;
+                std::vector<std::pair<sf::Uint8, std::unique_ptr<sf::TcpSocket>>> m_peers;
         };
     }
 }
