@@ -12,20 +12,22 @@ namespace rts
     {
         namespace game
         {
+            const int num_turns_to_store = 5;
+
             class CommandList : private sf::NonCopyable
             {
                 public:
-                    explicit CommandList(int turns_to_store);
+                    CommandList();
 
                     void add_command(const Command &command);
                     void next_turn();
 
+                    sf::Uint32 get_turn() const;
                     Command get_command();
 
                 private:
                     std::set<Command, bool(*)(const Command &a, const Command &b)> m_commands;
-                    int m_turns_to_store;
-                    unsigned int m_current_turn;
+                    sf::Uint32 m_current_turn;
             };
         }
     }

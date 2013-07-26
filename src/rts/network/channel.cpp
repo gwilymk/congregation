@@ -24,7 +24,7 @@ namespace rts
         void Channel::add_peer(const sf::IpAddress &peer_address, unsigned short port, sf::Uint8 player_num)
         {
             std::unique_ptr<sf::TcpSocket> s(new sf::TcpSocket());
-            std::cerr << "Connecting to " << peer_address.toString() << ":" << port << std::endl;
+            std::cerr << "Connecting to " << peer_address.toString() << ":" << port << " (will be player " << (unsigned) player_num << ")\n";
             ASSERT(s->connect(peer_address, port, sf::seconds(3.0f)) == sf::Socket::Done);
             sf::Packet greeting;
             greeting << m_my_player;
@@ -100,11 +100,11 @@ namespace rts
         {
             std::unique_ptr<sf::TcpSocket> s(new sf::TcpSocket());
             if(m_listener.accept(*s) == sf::Socket::Done) {
-                std::cerr << "Got peer " << s->getRemoteAddress().toString() << std::endl;
                 sf::Packet greeting;
                 s->receive(greeting);
                 sf::Uint8 player_num_of_peer;
                 greeting >> player_num_of_peer;
+                std::cerr << "Got peer " << s->getRemoteAddress().toString() << " who is player " << (unsigned) player_num_of_peer << std::endl;
                 s->setBlocking(false);
                 m_peers.push_back(std::make_pair(player_num_of_peer, std::move(s)));
             }
@@ -133,6 +133,7 @@ namespace rts
             sf::Socket::Status ret = sf::Socket::Error;
             for(auto peer = m_peers.begin() ; peer != m_peers.end() ; ++peer) {
                 ret = peer->second->receive(packet);
+                ASSERT(ret != sf::Socket::Error);
                 player = peer->first;
                 if(ret == sf::Socket::Done) return ret;
             }
@@ -143,7 +144,10 @@ namespace rts
         sf::Socket::Status Channel::send(sf::Packet &packet)
         {
             for(auto peer = m_peers.begin() ; peer != m_peers.end() ; ++peer) {
-                sf::Socket::Status status = peer->second->send(packet);
+                sf::Socket::Status status = sf::Socket::NotReady;
+                while(status == sf::Socket::NotReady)
+                    status = peer->second->send(packet);
+                    
                 if(status != sf::Socket::Done) return status;
             }
 

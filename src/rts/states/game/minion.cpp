@@ -3,7 +3,7 @@
 
 namespace
 {
-    const sf::Time frame_length = sf::seconds(1.0 / 5.0);
+    const sf::Time frame_length = sf::seconds(1.0 / 15.0);
 }
 
 namespace rts
@@ -74,22 +74,21 @@ namespace rts
                 m_selected = false;
             }
 
-            void Minion::update(sf::Time dt)
+            void Minion::update(int millis)
             {
+                sf::Time dt = sf::milliseconds(millis);
+
+                m_moving = m_path.move(m_x, m_y, 3, m_direction);
+
                 if(m_moving) {
                     m_frame_time += dt;
                     if(m_frame_time > frame_length) {
-                        m_frame = (m_frame + 1) % 4;
+                        m_frame = (m_frame + 1) % 8;
                         m_frame_time -= frame_length;
                     }
                 } else {
                     m_frame = 0;
                 }
-            }
-
-            void Minion::set_moving(bool moving)
-            {
-                m_moving = moving;
             }
 
             void Minion::set_direction(sf::Uint8 direction)
@@ -105,6 +104,11 @@ namespace rts
             void Minion::toggle_selection()
             {
                 m_selected = !m_selected;
+            }
+
+            void Minion::move_to(sf::Uint16 x, sf::Uint16 y)
+            {
+                m_path = Path(x, y);
             }
 
             void Minion::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -135,9 +139,9 @@ namespace rts
                 va[2].texCoords = sf::Vector2f((m_direction + 1) * 32, (m_hatid + 1) * 48);
                 va[3].texCoords = sf::Vector2f(m_direction * 32, (m_hatid + 1) * 48);
                 
-                if(m_direction % 2 == 1 && m_frame % 2 == 0) 
+                if(m_direction % 2 == 1 && (m_frame == 2 || m_frame == 6))
                     for(int i = 0; i < 4; ++i)
-                        va[i].texCoords += sf::Vector2f(0, 1);
+                        va[i].texCoords -= sf::Vector2f(0, 1);
 
                 states.texture = m_hat_texture;
                 target.draw(va, states);

@@ -24,6 +24,7 @@ add_executable(${EXECUTABLE_NAME}
     src/rts/states/game/command_list.cpp
     src/rts/states/game/lobby.cpp
     src/rts/states/game/minion.cpp
+    src/rts/states/game/path.cpp
     src/rts/states/game_state.cpp
     src/rts/states/game/tile.cpp
     src/rts/states/loading_state.cpp

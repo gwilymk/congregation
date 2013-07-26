@@ -16,6 +16,9 @@ namespace rts
 {
     namespace network
     {
+        const std::string next_turn = "ready for turn";
+        const std::string add_command = "add command";
+
         class Channel : private sf::NonCopyable
         {
             public:

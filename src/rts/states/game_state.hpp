@@ -54,7 +54,9 @@ namespace rts
                 network::Server *m_server;
                 network::Channel m_channel;
                 network::ServerInfo m_info;
-
+                sf::Time m_update_time;
+                bool m_finished_current_turn = false;
+                std::vector<sf::Uint32> m_player_turns;
 
                 CurrentState m_state;
 

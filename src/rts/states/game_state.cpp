@@ -1,13 +1,17 @@
 #include "game_state.hpp"
 #include "rts/states/game/lobby.hpp"
 #include "rts/network/server.hpp"
+#include "rts/states/game/command.hpp"
 
 #include <SFGUI/SFGUI.hpp>
+#include <iostream>
 
 namespace
 {
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
+    const sf::Time turn_time = sf::milliseconds(200);
+    const int millis_per_update = 1000 / 30;
 
     const float s = 0.8, v = 0.8;
     
@@ -61,9 +65,10 @@ namespace rts
             State(stack, context),
             m_lobby_done(false),
             m_desktop(),
-            m_commands(5),
+            m_commands(),
             m_server(nullptr),
             m_channel(&m_lobby_done),
+            m_update_time(sf::Time::Zero),
             m_state(CurrentState::InLobby),
             m_selecting(false),
             m_selected_sprite(context.texture_holder->get("select_arrow"))
@@ -213,6 +218,27 @@ namespace rts
                     }
 
                     m_selecting = false;
+                } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Right) {
+                    game::Command command;
+                    command.type = game::Command::COMMAND::MoveUnits;
+                    for(auto minion : m_my_minions) {
+                        if(m_minions[minion].selected()) {
+                            command.unit_move.to_move.push_back(minion);
+                        }
+                    }
+
+                    if(!command.unit_move.to_move.empty()) {
+                        sf::Vector2f target = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+                        command.unit_move.x = target.x;
+                        command.unit_move.y = target.y;
+                        command.turn = m_commands.get_turn() + game::num_turns_to_store;
+
+                        m_commands.add_command(command);
+                        sf::Packet packet;
+                        packet << network::add_command;
+                        packet << command;
+                        ASSERT(m_channel.send(packet) == sf::Socket::Done);
+                    }
                 }
             }
             return true;
@@ -307,15 +333,90 @@ namespace rts
             std::uniform_int_distribution<sf::Uint8> player_dist(0, m_info.max_players - 1);
             for(int i = 0; i < 500; ++i) 
                 create_minion(pos_dist(m_random), pos_dist(m_random), player_dist(m_random));
+
+            for(int i = 0; i < m_channel.num_players(); ++i)
+                m_player_turns.push_back(0);
+            std::cerr << "Started a game for " << m_channel.num_players() << " players\n";
         }
 
         void GameState::playing_update(sf::Time dt)
         {
+
+            sf::Packet packet;
+            sf::Uint8 playerid;
+
+            if(m_update_time > turn_time && m_finished_current_turn == false) {
+                m_finished_current_turn = true;
+                packet.clear();
+                packet << network::next_turn;
+                packet << m_commands.get_turn();
+                ASSERT(m_channel.send(packet) == sf::Socket::Done);
+            }
+
+            while(m_channel.receive(packet, playerid) == sf::Socket::Done) {
+                std::string message;
+                packet >> message;
+                if(message == network::next_turn) {
+                    sf::Uint32 turn_num;
+                    packet >> turn_num;
+                    m_player_turns[playerid] = turn_num;
+                    if(turn_num > m_commands.get_turn() + game::num_turns_to_store) {
+                        std::cerr << "Player " << (unsigned) playerid << " is on turn " << turn_num << " but I'm on turn " << (unsigned) m_commands.get_turn() << "!\n";
+                        ASSERT(false);
+                    }
+                } else if(message == network::add_command) {
+                    game::Command command;
+                    packet >> command;
+                    m_commands.add_command(command);
+                } else {
+                    ASSERT(false);
+                }
+
+                packet.clear();
+            }
+
+            if(m_finished_current_turn) {
+                for(unsigned int i = 0; i < m_player_turns.size(); ++i) {
+                    if(m_player_turns[i] + game::num_turns_to_store - 1 <= m_commands.get_turn()) {
+                        std::cerr << "Player " << i << " is holding the game up ";
+                        for(auto i : m_player_turns) std::cerr << i << " ";
+                        std::cerr << std::endl;
+                        return;
+                    }
+                }
+
+                m_commands.next_turn();
+                m_player_turns[m_my_player] = m_commands.get_turn();
+                m_finished_current_turn = false;
+                m_update_time -= turn_time;
+
+                bool done = false;
+                while(!done) {
+                    game::Command command;
+                    command = m_commands.get_command();
+
+                    switch(command.type) {
+                        case game::Command::COMMAND::MoveUnits:
+                            std::cerr << "Moving " << command.unit_move.to_move.size() << " minion(s) to " << command.unit_move.x << ", " << command.unit_move.y << std::endl;
+                            for(auto minion : command.unit_move.to_move)
+                                m_minions[minion].move_to(command.unit_move.x, command.unit_move.y);
+                        case game::Command::COMMAND::PlacePiece:
+                            break;
+                        case game::Command::COMMAND::Invalid:
+                            done = true;
+                            break;
+                        default:
+                            ASSERT(false);
+                    }
+                }
+            }
+
+            m_update_time += turn_time;
             update_input(dt);
 
             for(auto &minion : m_minions) {
                 if(minion.alive())
-                    minion.update(dt);
+                    minion.update(millis_per_update);
             }
 
             sf::Vector2f size = m_view.getSize();
@@ -365,6 +466,7 @@ namespace rts
                 m_free_list.erase(itr);
             } else {
                 minionid = m_minions.size();
+                minion.set_direction(minionid % 4);
                 m_minions.push_back(minion);
             }
 

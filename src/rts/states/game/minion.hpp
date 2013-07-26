@@ -10,6 +10,7 @@
 #include <SFML/Graphics/Shader.hpp>
 
 #include <SFML/Config.hpp>
+#include "rts/states/game/path.hpp"
 
 namespace rts
 {
@@ -24,7 +25,7 @@ namespace rts
 
                     Minion(sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader);
 
-                    void update(sf::Time dt);
+                    void update(int millis);
 
                     sf::Uint16 get_x() const;
                     sf::Uint16 get_y() const;;
@@ -32,7 +33,6 @@ namespace rts
                     void set_y(sf::Uint16 y);
 
                     void set_direction(sf::Uint8 direction);
-                    void set_moving(bool moving);
 
                     void kill();
                     bool alive() const;
@@ -41,6 +41,8 @@ namespace rts
                     void select();
                     void deselect();
                     void toggle_selection();
+
+                    void move_to(sf::Uint16 x, sf::Uint16 y);
 
                     sf::FloatRect get_bounds() const;
 
@@ -64,6 +66,8 @@ namespace rts
                     sf::Texture *m_texture;
                     sf::Texture *m_hat_texture;
                     sf::Shader *m_shader;
+
+                    Path m_path;
             };
         }
     }

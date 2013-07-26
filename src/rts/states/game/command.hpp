@@ -28,8 +28,8 @@ namespace rts
                 } piece_place;
                 struct {
                     std::vector<sf::Uint16> to_move;
-                    sf::Uint8 x;
-                    sf::Uint8 y;
+                    sf::Uint16 x;
+                    sf::Uint16 y;
                 } unit_move;
 
                 static bool less(const Command &a, const Command &b);

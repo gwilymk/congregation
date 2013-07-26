@@ -1,4 +1,5 @@
 #include "command.hpp"
+#include <iostream>
 
 #include <stdexcept>
 
@@ -28,7 +29,10 @@ namespace rts
                         break;
                         
                     case Command::COMMAND::MoveUnits:
-                        packet << (sf::Uint16) command.unit_move.to_move.size();
+                        sf::Uint16 size;
+
+                        size = command.unit_move.to_move.size();
+                        packet << size;
                         
                         for(sf::Uint16 id : command.unit_move.to_move) {
                             packet << id;
@@ -59,10 +63,11 @@ namespace rts
                         sf::Uint16 size;
                         packet >> size;
                         command.unit_move.to_move = std::vector<sf::Uint16>();
-                        command.unit_move.to_move.reserve(size);
 
-                        for(sf::Int16 i = 0 ; i < size ; ++i) {
-                            packet >> command.unit_move.to_move[i];
+                        for(sf::Uint16 i = 0 ; i < size ; ++i) {
+                            sf::Uint16 tmp;
+                            packet >> tmp;
+                            command.unit_move.to_move.push_back(tmp);
                         }
 
                         packet >> command.unit_move.x >> command.unit_move.y;
