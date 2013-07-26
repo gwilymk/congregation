@@ -10,7 +10,7 @@ namespace
 {
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
-    const sf::Time turn_time = sf::milliseconds(200);
+    const sf::Time turn_time = sf::milliseconds(100);
     const int millis_per_update = 1000 / 30;
 
     const float s = 0.8, v = 0.8;
