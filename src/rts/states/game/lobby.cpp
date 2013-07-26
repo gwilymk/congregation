@@ -14,14 +14,6 @@ namespace
 {
     const sf::Time time_to_wait = sf::seconds(5);
 
-    template <typename T>
-    std::string number_to_string(T Number)
-    {
-        std::ostringstream ss;
-        ss << Number;
-        return ss.str();
-    }
-
     std::string string_format(const std::string fmt, ...) {
         int size = 100;
         std::string str;

@@ -76,6 +76,10 @@ namespace rts
                 sf::Uint8 m_my_player;
 
                 sf::Sprite m_selected_sprite;
+                sf::Sprite m_minion_counter_sprite;
+                sf::Sprite m_tile_placement_box_sprite;
+                sf::Sprite m_hud_background_sprite;
+                sf::Text m_minion_counter_text;
 
                 sf::View m_view;
         };

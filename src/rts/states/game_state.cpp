@@ -71,7 +71,11 @@ namespace rts
             m_update_time(sf::Time::Zero),
             m_state(CurrentState::InLobby),
             m_selecting(false),
-            m_selected_sprite(context.texture_holder->get("select_arrow"))
+            m_selected_sprite(context.texture_holder->get("select_arrow")),
+            m_minion_counter_sprite(context.texture_holder->get("minion counter")),
+            m_tile_placement_box_sprite(context.texture_holder->get("tile placement box")),
+            m_hud_background_sprite(context.texture_holder->get("hud background")),
+            m_minion_counter_text("0", context.font_holder->get("font"))
         {
             m_lobby = new game::Lobby(&m_lobby_done);
             m_lobby->add_to_desktop(m_desktop);
@@ -117,6 +121,17 @@ namespace rts
                 rect.setFillColor(sf::Color::Transparent);
                 get_context().window->draw(rect);
             }
+
+            sf::Vector2u window_size = get_context().window->getSize();
+            sf::FloatRect view_rectf(0, 0, window_size.x, window_size.y);
+            get_context().window->setView(sf::View(view_rectf));
+
+            sf::IntRect view_recti(0, 0, m_hud_background_sprite.getLocalBounds().width, window_size.y);
+            m_hud_background_sprite.setTextureRect(view_recti);
+            get_context().window->draw(m_hud_background_sprite);
+            get_context().window->draw(m_tile_placement_box_sprite);
+
+            get_context().window->setView(m_view);
         }
 
         bool GameState::update(sf::Time dt)
@@ -422,8 +437,8 @@ namespace rts
             sf::Vector2f size = m_view.getSize();
             sf::Vector2f center = m_view.getCenter();
 
-            if(center.x - size.x / 2.0 < 0)
-                center.x = size.x / 2.0;
+            if(center.x - size.x / 2.0 + 160 < 0)
+                center.x = size.x / 2.0 - 160;
             if(center.y - size.y / 2.0 < 0)
                 center.y = size.y / 2.0;
             if(center.x + size.x / 2.0 > m_size * 128)
