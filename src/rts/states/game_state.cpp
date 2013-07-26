@@ -7,6 +7,7 @@
 namespace
 {
     const float move_speed = 5.0;
+    const float zoom_speed = 1.2;
 
     const float s = 0.8, v = 0.8;
     
@@ -120,6 +121,17 @@ namespace rts
                 request_stack_pop();
 
             m_desktop.HandleEvent(event);
+
+            if(m_state == CurrentState::Playing) {
+                if(event.type == sf::Event::MouseWheelMoved) {
+                    int delta = event.mouseWheel.delta;
+                    if(delta >= 0) {
+                        m_view.zoom(1 / (delta * zoom_speed));
+                    } else {
+                        m_view.zoom(-delta * zoom_speed);
+                    }
+                }
+            }
             return true;
         }
 
