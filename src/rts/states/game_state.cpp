@@ -65,6 +65,7 @@ namespace rts
             m_server(nullptr),
             m_channel(&m_lobby_done),
             m_state(CurrentState::InLobby),
+            m_selecting(false),
             m_selected_sprite(context.texture_holder->get("select_arrow"))
         {
             m_lobby = new game::Lobby(&m_lobby_done);
@@ -100,6 +101,16 @@ namespace rts
                         get_context().window->draw(m_selected_sprite);
                     }
                 }
+            }
+
+            if(m_selecting) {
+                sf::RectangleShape rect;
+                rect.setPosition(m_select_start);
+                rect.setSize(m_select_end - m_select_start);
+                rect.setOutlineThickness(5);
+                rect.setOutlineColor(sf::Color::Black);
+                rect.setFillColor(sf::Color::Transparent);
+                get_context().window->draw(rect);
             }
         }
 
@@ -149,17 +160,59 @@ namespace rts
                         m_view.setSize(view_size);
                     }
                 } else if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Button::Left) {
+                    m_select_end = m_select_start = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));                   
+                    m_selecting = true;
+                } else if(m_selecting && event.type == sf::Event::MouseMoved) {
+                    m_select_end = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y));
+                } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Left) {
                     if(!sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
                         for(auto &minion : m_my_minions)
                             m_minions[minion].deselect();
                     
                     sf::Vector2i mousecoords(event.mouseButton.x, event.mouseButton.y);
-                    sf::Vector2f world_pos = get_context().window->mapPixelToCoords(mousecoords);
+                    m_select_end = get_context().window->mapPixelToCoords(mousecoords);
+
+                    if(m_select_start.x < m_select_end.x) {
+                        if(m_select_start.y > m_select_end.y) {
+                            sf::Vector2f tmp1, tmp2;
+                            tmp1.x = m_select_start.x;
+                            tmp1.y = m_select_end.y;
+                            tmp2.x = m_select_end.x;
+                            tmp2.y = m_select_start.y;
+
+                            m_select_start = tmp1;
+                            m_select_end = tmp2;
+                        }
+                    } else {
+                        if(m_select_start.y > m_select_end.y) {
+                            std::swap(m_select_start, m_select_end);
+                        } else {
+                            sf::Vector2f tmp1, tmp2;
+                            tmp1.x = m_select_start.x;
+                            tmp1.y = m_select_end.y;
+                            tmp2.x = m_select_end.x;
+                            tmp2.y = m_select_start.y;
+
+                            m_select_start = tmp2;
+                            m_select_end = tmp1;
+                        }
+                    }
+
+                    sf::Vector2f size = m_select_end - m_select_start;
+                    sf::FloatRect rect = sf::FloatRect(m_select_start, size);
+                    bool rectangle_select = size.x * size.x + size.y * size.y > 10;
                     
                     for(auto minion : m_my_minions) {
-                        if(m_minions[minion].get_bounds().contains(world_pos))
-                            m_minions[minion].toggle_selection();
+                        if(rectangle_select) {
+                            if(rect.intersects(m_minions[minion].get_bounds()))
+                                m_minions[minion].toggle_selection();
+                        } else {
+                            if(m_minions[minion].get_bounds().contains(m_select_start))
+                                m_minions[minion].toggle_selection();
+                        }
                     }
+
+                    m_selecting = false;
                 }
             }
             return true;

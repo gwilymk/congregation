@@ -61,6 +61,9 @@ namespace rts
                 sfg::Label::Ptr m_status_label;
 
                 int m_size;
+                bool m_selecting;
+                sf::Vector2f m_select_start;
+                sf::Vector2f m_select_end;
                 std::vector<game::Tile> m_tiles;
                 std::vector<game::Minion> m_minions;
                 std::vector<sf::Uint16> m_my_minions;
