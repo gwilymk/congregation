@@ -90,7 +90,9 @@ namespace rts
 
             static void push(lua_State *L, const lua_function &val)
             {
-                lua_getfield(L, LUA_REGISTRYINDEX, "function_state");
+                static const char key = 'k';
+                lua_pushlightuserdata(L, (void *)&key);
+                lua_gettable(L, LUA_REGISTRYINDEX);
                 if(lua_isnil(L, -1)) {
                     lua_pop(L, 1);
                     new (lua_newuserdata(L, sizeof(function_list))) function_list();
@@ -98,6 +100,9 @@ namespace rts
                     lua_pushcfunction(L, &Stack<lua_function>::function_list___gc);
                     lua_setfield(L, -2, "__gc");
                     lua_setmetatable(L, -2);
+                    lua_pushlightuserdata(L, (void *)&key);
+                    lua_pushvalue(L, -2);
+                    lua_settable(L, LUA_REGISTRYINDEX);
                 } 
 
                 function_list *list = (function_list *) lua_touserdata(L, -1);
