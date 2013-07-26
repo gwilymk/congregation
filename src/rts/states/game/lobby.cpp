@@ -158,7 +158,7 @@ namespace rts
 
             void Lobby::update_server_list()
             {
-                assert(!*m_done);
+                ASSERT(!*m_done);
                 m_impl->server_list->RemoveAll();
                 m_impl->servers.clear();
                 m_impl->callbacks.clear();
@@ -172,7 +172,7 @@ namespace rts
 
             void Lobby::create_server()
             {
-                assert(!*m_done);
+                ASSERT(!*m_done);
 
                 sf::String num_players_str = m_impl->num_players->GetSelectedText();
                 if(num_players_str.isEmpty()) 
@@ -238,12 +238,12 @@ namespace rts
                         std::cerr << "Found server: " << addr.toString() << ":" << tcp_port << std::endl;
                         sf::TcpSocket request_socket;
 
-                        assert(request_socket.connect(addr, tcp_port) == sf::Socket::Done);
+                        ASSERT(request_socket.connect(addr, tcp_port) == sf::Socket::Done);
                         sf::Packet query;
                         query << network::want_info;
-                        assert(request_socket.send(query) == sf::Socket::Done);
-                        assert(request_socket.receive(packet) == sf::Socket::Done);
-                        assert(packet >> info);
+                        ASSERT(request_socket.send(query) == sf::Socket::Done);
+                        ASSERT(request_socket.receive(packet) == sf::Socket::Done);
+                        ASSERT(packet >> info);
                         request_socket.disconnect();
 
                         m_impl->servers.push_back(std::make_pair(addr, tcp_port));
