@@ -15,11 +15,13 @@ namespace rts
             m_lua_state.push<std::function<int(lua_State *)>>(
             [this] (lua_State *L_raw) -> int {
                 lua::State L(L_raw);
-                ASSERT(L.get_top() == 2);
+                ASSERT(L.get_top() == 3);
                 std::string name = L.get<std::string>(1);
                 std::string fname = L.get<std::string>(2);
+                bool smooth = L.get<bool>(3);
 
                 get_context().texture_holder->load(name, fname);
+                get_context().texture_holder->get(name).setSmooth(smooth);
                 return 0;
             });
             m_lua_state.set_field(-2, "load_texture");

@@ -26,13 +26,23 @@ namespace rts
 
                     void update(sf::Time dt);
 
-                    sf::Uint16 get_x();
-                    sf::Uint16 get_y();
+                    sf::Uint16 get_x() const;
+                    sf::Uint16 get_y() const;;
                     void set_x(sf::Uint16 x);
                     void set_y(sf::Uint16 y);
 
                     void set_direction(sf::Uint8 direction);
                     void set_moving(bool moving);
+
+                    void kill();
+                    bool alive() const;
+
+                    bool selected() const;
+                    void select();
+                    void deselect();
+                    void toggle_selection();
+
+                    sf::FloatRect get_bounds() const;
 
                 private:
                     void draw(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -48,6 +58,8 @@ namespace rts
                     sf::Uint8 m_direction;
 
                     bool m_moving;
+                    bool m_alive;
+                    bool m_selected;
                     
                     sf::Texture *m_texture;
                     sf::Texture *m_hat_texture;

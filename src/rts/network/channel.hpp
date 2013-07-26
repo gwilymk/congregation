@@ -27,6 +27,7 @@ namespace rts
                 void update();
                 int num_players();
                 int max_players();
+                sf::Uint8 get_my_player() const;
 
                 sf::Socket::Status receive(sf::Packet &packet, sf::Uint8 &player);
                 sf::Socket::Status send(sf::Packet &packet);

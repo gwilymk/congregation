@@ -64,12 +64,14 @@ namespace rts
             m_commands(5),
             m_server(nullptr),
             m_channel(&m_lobby_done),
-            m_state(CurrentState::InLobby)
+            m_state(CurrentState::InLobby),
+            m_selected_sprite(context.texture_holder->get("select_arrow"))
         {
             m_lobby = new game::Lobby(&m_lobby_done);
             m_lobby->add_to_desktop(m_desktop);
 
             m_view = get_context().window->getView();
+            m_selected_sprite.setOrigin(12, 71);
         }
 
         GameState::~GameState()
@@ -90,8 +92,15 @@ namespace rts
 
             get_context().window->draw(array, &get_context().texture_holder->get("tiles"));
 
-            for(auto &minion : m_minions)
-                get_context().window->draw(minion);
+            for(auto &minion : m_minions) {
+                if(minion.alive()) {
+                    get_context().window->draw(minion);
+                    if(minion.selected()) {
+                        m_selected_sprite.setPosition(minion.get_x(), minion.get_y());
+                        get_context().window->draw(m_selected_sprite);
+                    }
+                }
+            }
         }
 
         bool GameState::update(sf::Time dt)
@@ -129,6 +138,27 @@ namespace rts
                         m_view.zoom(1 / (delta * zoom_speed));
                     } else {
                         m_view.zoom(-delta * zoom_speed);
+                    }
+
+                    sf::Vector2f view_size = m_view.getSize();
+                    sf::Vector2u window_size = get_context().window->getSize();
+
+                    if((float)window_size.x / view_size.x < 0.5) {
+                        view_size.x = window_size.x * 2.0;
+                        view_size.y = window_size.y * 2.0;
+                        m_view.setSize(view_size);
+                    }
+                } else if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Button::Left) {
+                    if(!sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+                        for(auto &minion : m_my_minions)
+                            m_minions[minion].deselect();
+                    
+                    sf::Vector2i mousecoords(event.mouseButton.x, event.mouseButton.y);
+                    sf::Vector2f world_pos = get_context().window->mapPixelToCoords(mousecoords);
+                    
+                    for(auto minion : m_my_minions) {
+                        if(m_minions[minion].get_bounds().contains(world_pos))
+                            m_minions[minion].toggle_selection();
                     }
                 }
             }
@@ -189,6 +219,8 @@ namespace rts
 
         void GameState::setting_up_update(sf::Time)
         {
+            m_my_player = m_channel.get_my_player();
+
             std::array<sf::Uint32, network::seed_size> seed = m_channel.get_seed();
             std::seed_seq seq(seed.begin(), seed.end());
             m_random.seed(seq);
@@ -229,9 +261,23 @@ namespace rts
             update_input(dt);
 
             for(auto &minion : m_minions) {
-                minion.update(dt);
+                if(minion.alive())
+                    minion.update(dt);
             }
 
+            sf::Vector2f size = m_view.getSize();
+            sf::Vector2f center = m_view.getCenter();
+
+            if(center.x - size.x / 2.0 < 0)
+                center.x = size.x / 2.0;
+            if(center.y - size.y / 2.0 < 0)
+                center.y = size.y / 2.0;
+            if(center.x + size.x / 2.0 > m_size * 128)
+                center.x = m_size * 128 - size.x / 2.0;
+            if(center.y + size.y / 2.0 > m_size * 128)
+                center.y = m_size * 128 - size.y / 2.0;
+
+            m_view.setCenter(center);
             get_context().window->setView(m_view);
         }
 
@@ -251,9 +297,32 @@ namespace rts
 
         void GameState::create_minion(sf::Uint16 x, sf::Uint16 y, sf::Uint8 player_num)
         {
-            std::uniform_int_distribution<sf::Uint8> hat_dist(0, 8);
-            game::Minion minion(hat_dist(m_random), m_player_colours[player_num], x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"), &get_context().shader_holder->get("minion"));
-            m_minions.push_back(minion);
+            std::uniform_int_distribution<sf::Uint8> hat_dist(0, 16);
+            sf::Uint8 hatid = hat_dist(m_random);
+            if(hatid >= 9)
+                hatid = game::Minion::NO_HAT;
+            game::Minion minion(hatid, m_player_colours[player_num], x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"), &get_context().shader_holder->get("minion"));
+
+            sf::Uint16 minionid;
+
+            if(!m_free_list.empty()) {
+                auto itr = m_free_list.begin();
+                m_minions[*itr] = minion;
+                minionid = *itr;
+                m_free_list.erase(itr);
+            } else {
+                minionid = m_minions.size();
+                m_minions.push_back(minion);
+            }
+
+            if(player_num == m_my_player)
+                m_my_minions.push_back(minionid);
+        }
+
+        void GameState::kill_minion(sf::Uint16 id)
+        {
+            m_minions[id].kill();
+            m_free_list.insert(id);
         }
     }
 }

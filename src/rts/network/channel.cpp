@@ -123,9 +123,14 @@ namespace rts
             std::cerr << "Starting to listen on port " << (sf::Uint16) m_listener.getLocalPort() << std::endl;
         }
 
+        sf::Uint8 Channel::get_my_player() const
+        {
+            return m_my_player;
+        }
+
         sf::Socket::Status Channel::receive(sf::Packet &packet, sf::Uint8 &player)
         {
-            sf::Socket::Status ret;
+            sf::Socket::Status ret = sf::Socket::Error;
             for(auto peer = m_peers.begin() ; peer != m_peers.end() ; ++peer) {
                 ret = peer->second->receive(packet);
                 player = peer->first;

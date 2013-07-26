@@ -21,18 +21,20 @@ namespace rts
                 m_frame_time(frame_length),
                 m_direction(2),
                 m_moving(false),
+                m_alive(true),
+                m_selected(false),
                 m_texture(texture),
                 m_hat_texture(hat_texture),
                 m_shader(shader)
             {
             }
 
-            sf::Uint16 Minion::get_x()
+            sf::Uint16 Minion::get_x() const
             {
                 return m_x;
             }
 
-            sf::Uint16 Minion::get_y()
+            sf::Uint16 Minion::get_y() const
             {
                 return m_y;
             }
@@ -45,6 +47,31 @@ namespace rts
             void Minion::set_y(sf::Uint16 y)
             {
                 m_y = y;
+            }
+
+            void Minion::kill()
+            {
+                m_alive = false;
+            }
+
+            bool Minion::alive() const
+            {
+                return m_alive;
+            }
+
+            bool Minion::selected() const
+            {
+                return m_selected;
+            }
+
+            void Minion::select()
+            {
+                m_selected = true;
+            }
+
+            void Minion::deselect()
+            {
+                m_selected = false;
             }
 
             void Minion::update(sf::Time dt)
@@ -68,6 +95,16 @@ namespace rts
             void Minion::set_direction(sf::Uint8 direction)
             {
                 m_direction = direction;
+            }
+
+            sf::FloatRect Minion::get_bounds() const
+            {
+                return sf::FloatRect(get_x() - 16, get_y() - 39, 32, 48);
+            }
+
+            void Minion::toggle_selection()
+            {
+                m_selected = !m_selected;
             }
 
             void Minion::draw(sf::RenderTarget &target, sf::RenderStates states) const

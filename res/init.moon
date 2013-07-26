@@ -14,7 +14,7 @@ load_resource = (filename) ->
             when "font"
                 load_font tbl.name, "../res/" .. tbl.filename
             when "texture"
-                load_texture tbl.name, "../res/" .. tbl.filename
+                load_texture tbl.name, "../res/" .. tbl.filename, tbl.smooth
             when "shader"
                 load_shader tbl.name, "../res/" .. tbl.vertex, "../res/" .. tbl.fragment
             else
@@ -28,6 +28,7 @@ resource_files = {
     "textures/tiles.lua"
     "textures/minion.lua"
     "textures/hats.lua"
+    "textures/select_arrow.lua"
     "fonts/font.lua"
     "shaders/minion.lua"
 }
