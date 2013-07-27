@@ -298,7 +298,8 @@ namespace rts
                         command.place_piece.y = target.y / 128;
                         if(command.place_piece.x < m_size && command.place_piece.y < m_size) {
                             command.place_piece.tile = m_next_tile;
-                            if(m_visibility[command.place_piece.x + command.place_piece.y * m_size] == 2) {
+                            unsigned position_id = command.place_piece.x + command.place_piece.y * m_size;
+                            if(m_visibility[position_id] == 2 && m_tiles[position_id].id < game::num_grass_tiles) {
                                 send_command(command);
                                 m_placing_tile = false;
                                 m_next_tile.id = m_tile_dist(m_tile_random);
