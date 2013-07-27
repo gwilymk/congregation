@@ -13,6 +13,10 @@ namespace
     const sf::Time turn_time = sf::milliseconds(200);
     const int millis_per_update = 1000 / 30;
 
+    const int start_positions[rts::network::max_players][2] = {
+        {0, 0}, {2, 2}, {2, 0}, {0, 2}, {1, 0}, {2, 1}, {1, 2}, {0, 1}
+    };
+
     const float s = 0.8, v = 0.8;
     
     sf::Color get_colour(float h)
@@ -198,8 +202,12 @@ namespace rts
                         m_view.setSize(view_size);
                     }
                 } else if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Button::Left) {
-                    m_select_end = m_select_start = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));                   
-                    m_selecting = true;
+                    if(event.mouseButton.x <= 160) {
+                        
+                    } else {
+                        m_select_end = m_select_start = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));                   
+                        m_selecting = true;
+                    }
                 } else if(m_selecting && event.type == sf::Event::MouseMoved) {
                     m_select_end = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y));
                 } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Left) {
@@ -252,25 +260,27 @@ namespace rts
 
                     m_selecting = false;
                 } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Right) {
-                    game::Command command;
-                    command.type = game::Command::COMMAND::MoveUnits;
-                    for(auto minion : m_my_minions) {
-                        if(m_minions[minion].selected()) {
-                            command.unit_move.to_move.push_back(minion);
+                    if(event.mouseButton.x > 160) {
+                        game::Command command;
+                        command.type = game::Command::COMMAND::MoveUnits;
+                        for(auto minion : m_my_minions) {
+                            if(m_minions[minion].selected()) {
+                                command.unit_move.to_move.push_back(minion);
+                            }
                         }
-                    }
 
-                    if(!command.unit_move.to_move.empty()) {
-                        sf::Vector2f target = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
-                        command.unit_move.x = target.x;
-                        command.unit_move.y = target.y;
-                        command.turn = m_commands.get_turn() + game::num_turns_to_store;
+                        if(!command.unit_move.to_move.empty()) {
+                            sf::Vector2f target = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+                            command.unit_move.x = target.x;
+                            command.unit_move.y = target.y;
+                            command.turn = m_commands.get_turn() + game::num_turns_to_store;
 
-                        m_commands.add_command(command);
-                        sf::Packet packet;
-                        packet << network::add_command;
-                        packet << command;
-                        ASSERT(m_channel.send(packet) == sf::Socket::Done);
+                            m_commands.add_command(command);
+                            sf::Packet packet;
+                            packet << network::add_command;
+                            packet << command;
+                            ASSERT(m_channel.send(packet) == sf::Socket::Done);
+                        }
                     }
                 }
             }
@@ -352,20 +362,37 @@ namespace rts
 
             m_state = CurrentState::Playing;
 
-            std::uniform_int_distribution<sf::Uint16> pos_dist(0, m_size * 128 - 1);
-
             std::uniform_real_distribution<float> colour_dist(0, 1);
             float h = colour_dist(m_random);
-            m_player_colours.reserve(m_info.max_players);
+            m_player_colours.reserve(m_channel.num_players());
             for(int i = 0; i < m_info.max_players; ++i) {
                 m_player_colours[i] = get_colour(h);
                 h += 0.618033;
                 h -= (int)h;
             }
 
-            std::uniform_int_distribution<sf::Uint8> player_dist(0, m_info.max_players - 1);
-            for(int i = 0; i < 500; ++i) 
-                create_minion(pos_dist(m_random), pos_dist(m_random), player_dist(m_random));
+            for(int i = 0; i < m_channel.num_players(); ++i) {
+                sf::Uint16 x_coord;
+                sf::Uint16 y_coord;
+
+                if(start_positions[i][0] == 0) x_coord = 128 * 4;
+                else if(start_positions[i][0] == 1) x_coord = m_size / 2;
+                else if(start_positions[i][0] == 2) x_coord = m_size * 128 - 128 * 4;
+                else ASSERT(false);
+
+                if(start_positions[i][1] == 0) y_coord = 128 * 4;
+                else if(start_positions[i][1] == 1) y_coord = m_size / 2;
+                else if(start_positions[i][1] == 2) y_coord = m_size * 128 - 128 * 4;
+                else ASSERT(false);
+
+                x_coord += 64;
+                y_coord += 64;
+
+                create_minion(x_coord, y_coord, i);
+
+                if(i == m_my_player)
+                    m_view.setCenter(x_coord, y_coord);
+            }
 
             for(int i = 0; i < m_channel.num_players(); ++i)
                 m_player_turns.push_back(0);
@@ -526,6 +553,9 @@ namespace rts
 
         void GameState::create_minion(sf::Uint16 x, sf::Uint16 y, sf::Uint8 player_num)
         {
+            ASSERT(x > 0 && x < m_size * 128);
+            ASSERT(y > 0 && y < m_size * 128);
+
             std::uniform_int_distribution<sf::Uint8> hat_dist(0, 16);
             sf::Uint8 hatid = hat_dist(m_random);
             if(hatid >= 9)
