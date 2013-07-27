@@ -121,8 +121,11 @@ namespace rts
                 std::vector<Orientation> ret;
                 sf::Uint8 *c = connections[id];
                 sf::Uint8 current = abs_orientation;
-                while(current < 3 && c[current] != current)
+                tmp.insert(current);
+                while(current < 3 && c[current] != current) {
+                    current = c[current];
                     tmp.insert(current);
+                }
 
                 for(sf::Uint8 i = current; i < 255; --i) {
                     for(sf::Uint8 already_in : tmp) {
@@ -132,7 +135,8 @@ namespace rts
                 }
 
                 for(sf::Uint8 dir : tmp) {
-                    ret.push_back((Orientation) ((dir + orientation) % 4));
+                    if(dir != abs_orientation)
+                        ret.push_back((Orientation) ((dir + orientation) % 4));
                 }
 
                 return ret;
