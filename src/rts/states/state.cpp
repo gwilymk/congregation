@@ -6,13 +6,14 @@ namespace rts
 {
     namespace states
     {
-        State::Context::Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder, holders::ShaderHolder &shader_holder, holders::SoundHolder &sound_holder, holders::MusicHolder &music_holder, bool &focused):
+        State::Context::Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder, holders::ShaderHolder &shader_holder, holders::SoundHolder &sound_holder, holders::MusicHolder &music_holder, sfg::Desktop &desktop, bool &focused):
             window(&window),
             texture_holder(&texture_holder),
             font_holder(&font_holder),
             shader_holder(&shader_holder),
             sound_holder(&sound_holder),
             music_holder(&music_holder),
+            desktop(&desktop),
             focused(&focused)
         {
         }

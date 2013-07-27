@@ -15,6 +15,8 @@ namespace rts
 
             auto inserted = m_resource_map.insert(std::make_pair(name, std::move(resource)));
             ASSERT(inserted.second);
+            auto inserted2 = m_fname_map.insert(std::make_pair(name, filename));
+            ASSERT(inserted2.second);
         }
 
         template <class Resource>
@@ -26,6 +28,8 @@ namespace rts
 
             auto inserted = m_resource_map.insert(std::make_pair(name, std::move(resource)));
             ASSERT(inserted.second);
+            auto inserted2 = m_fname_map.insert(std::make_pair(name, filename));
+            ASSERT(inserted2.second);
         }
 
         template <class Resource>
@@ -44,6 +48,15 @@ namespace rts
             ASSERT(found != m_resource_map.end());
 
             return *found->second;
+        }
+
+        template <class Resource>
+        std::string Holder<Resource>::get_fname(const std::string &name) const
+        {
+            auto found = m_fname_map.find(name);
+            ASSERT(found != m_fname_map.end());
+
+            return found->second;
         }
     }
 }

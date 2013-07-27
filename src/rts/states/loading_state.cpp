@@ -2,6 +2,7 @@
 #include "rts/state_stack.hpp"
 #include "rts/states/id.hpp"
 #include "rts/holders/music_holder.hpp"
+#include <SFGUI/Desktop.hpp>
 
 namespace rts 
 {
@@ -82,6 +83,7 @@ namespace rts
         bool LoadingState::update(sf::Time)
         {
             m_lua_state.run_file("../res/init.lua");
+            get_context().desktop->SetProperty("*", "FontName", get_context().font_holder->get_fname("font"));
             request_stack_pop();
             request_stack_push(ID::TitleState);
             return true;

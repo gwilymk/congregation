@@ -9,6 +9,12 @@ namespace rts
     {
     }
 
+    StateStack::~StateStack()
+    {
+        while(!is_empty())
+            m_stack.pop_back();
+    }
+
     states::State::ptr StateStack::create_state(states::ID stateID)
     {
         auto found = m_factories.find(stateID);

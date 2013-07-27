@@ -65,7 +65,10 @@ namespace rts
         {
             while(true) {
                 m_mutex.lock();
-                if(started || stop) break;
+                if(started || stop) {
+                    m_mutex.unlock();   
+                    break;
+                }
 
                 sf::Packet packet;
                 sf::IpAddress addr;

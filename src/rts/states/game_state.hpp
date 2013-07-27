@@ -9,7 +9,6 @@
 #include "rts/network/server_info.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
-#include <SFGUI/Desktop.hpp>
 #include <SFGUI/Label.hpp>
 #include <vector>
 #include <random>
@@ -40,7 +39,7 @@ namespace rts
                 void update_input(sf::Time dt);
                 void setting_up_update(sf::Time dt);
 
-                void add_to_vertex_array(sf::VertexArray &array, const game::Tile &tile, int id);
+                void add_to_vertex_array(sf::VertexArray &array, int id);
 
                 void create_minion(sf::Uint16 x, sf::Uint16 y, sf::Uint8 player_num);
                 void kill_minion(sf::Uint16 id);
@@ -48,7 +47,6 @@ namespace rts
             private:
                 bool m_lobby_done;
                 
-                sfg::Desktop m_desktop;
                 game::CommandList m_commands;
                 game::Lobby *m_lobby;
                 network::Server *m_server;
@@ -70,6 +68,8 @@ namespace rts
                 std::vector<game::Minion> m_minions;
                 std::vector<sf::Uint16> m_my_minions;
                 std::vector<sf::Color> m_player_colours;
+                std::vector<std::vector<sf::Uint16>> m_minion_tiles;
+                std::vector<sf::Uint8> m_visibility;
                 std::set<int> m_free_list;
                 std::mt19937 m_random;
 
@@ -83,6 +83,7 @@ namespace rts
                 sf::Shader *m_minion_counter_shader;
 
                 sf::View m_view;
+
         };
     }
 }

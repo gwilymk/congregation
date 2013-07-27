@@ -10,7 +10,7 @@ namespace
 {
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
-    const sf::Time turn_time = sf::milliseconds(100);
+    const sf::Time turn_time = sf::milliseconds(200);
     const int millis_per_update = 1000 / 30;
 
     const float s = 0.8, v = 0.8;
@@ -42,33 +42,44 @@ namespace rts
 {
     namespace states
     {
-        void GameState::add_to_vertex_array(sf::VertexArray &array, const game::Tile &tile, int id)
+        void GameState::add_to_vertex_array(sf::VertexArray &array, int id)
         {
+            game::Tile tile = m_tiles[id];
+            if(m_visibility[id] == 0)
+                return;
             int tx = id % m_size;
             int ty = id / m_size;
 
             int tu = tile.id % 8;
             int tv = tile.id / 8;
 
-            array[id * 4 + 0].position = sf::Vector2f(128 * tx, 128 * ty);
-            array[id * 4 + 1].position = sf::Vector2f(128 * (tx + 1), 128 * ty);
-            array[id * 4 + 2].position = sf::Vector2f(128 * (tx + 1), 128 * (ty + 1));
-            array[id * 4 + 3].position = sf::Vector2f(128 * tx, 128 * (ty + 1));
+            sf::Vertex v[4];
 
-            array[id * 4 + (0 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * tu, 128 * tv);
-            array[id * 4 + (1 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * (tu + 1), 128 * tv);
-            array[id * 4 + (2 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * (tu + 1), 128 * (tv + 1));
-            array[id * 4 + (3 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * tu, 128 * (tv + 1));
+            v[0].position = sf::Vector2f(128 * tx, 128 * ty);
+            v[1].position = sf::Vector2f(128 * (tx + 1), 128 * ty);
+            v[2].position = sf::Vector2f(128 * (tx + 1), 128 * (ty + 1));
+            v[3].position = sf::Vector2f(128 * tx, 128 * (ty + 1));
+
+            v[(0 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * tu, 128 * tv);
+            v[(1 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * (tu + 1), 128 * tv);
+            v[(2 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * (tu + 1), 128 * (tv + 1));
+            v[(3 + tile.orientation) % 4].texCoords = sf::Vector2f(128 * tu, 128 * (tv + 1));
+
+            for(auto &vertex : v) {
+                if(m_visibility[id] == 1)
+                    vertex.color = sf::Color(150, 150, 150, 150);
+                array.append(vertex);
+            }
         }
 
         GameState::GameState(StateStack &stack, Context context):
             State(stack, context),
             m_lobby_done(false),
-            m_desktop(),
             m_commands(),
             m_server(nullptr),
             m_channel(&m_lobby_done),
             m_update_time(sf::Time::Zero),
+            m_player_turns(),
             m_state(CurrentState::InLobby),
             m_selecting(false),
             m_selected_sprite(context.texture_holder->get("select_arrow")),
@@ -79,7 +90,7 @@ namespace rts
             m_minion_counter_shader(&context.shader_holder->get("minion"))
         {
             m_lobby = new game::Lobby(&m_lobby_done);
-            m_lobby->add_to_desktop(m_desktop);
+            m_lobby->add_to_desktop(*get_context().desktop);
 
             m_view = get_context().window->getView();
             m_selected_sprite.setOrigin(12, 71);
@@ -98,16 +109,17 @@ namespace rts
             if(m_state != CurrentState::Playing) return;
 
             // draw tiles
-            sf::VertexArray array(sf::Quads, m_size * m_size * 4);
+            sf::VertexArray array(sf::Quads);
             for(int i = 0; i < m_size * m_size; ++i) {
-                add_to_vertex_array(array, m_tiles[i], i);
+                add_to_vertex_array(array, i);
             }
 
             get_context().window->draw(array, &get_context().texture_holder->get("tiles"));
 
             for(auto &minion : m_minions) {
                 if(minion.alive()) {
-                    get_context().window->draw(minion);
+                    if(m_visibility.at(minion.get_x() / 128 + (minion.get_y() / 128) * m_size) == 2)
+                        get_context().window->draw(minion);
                     if(minion.selected()) {
                         m_selected_sprite.setPosition(minion.get_x(), minion.get_y());
                         get_context().window->draw(m_selected_sprite);
@@ -142,7 +154,7 @@ namespace rts
 
         bool GameState::update(sf::Time dt)
         {
-            m_desktop.Update(dt.asSeconds());
+            get_context().desktop->Update(dt.asSeconds());
             switch(m_state) {
                 case CurrentState::InLobby:
                     lobby_update(dt);
@@ -166,7 +178,7 @@ namespace rts
             if(event.type == sf::Event::Closed)
                 request_stack_pop();
 
-            m_desktop.HandleEvent(event);
+            get_context().desktop->HandleEvent(event);
 
             if(m_state == CurrentState::Playing) {
                 if(event.type == sf::Event::MouseWheelMoved) {
@@ -294,7 +306,7 @@ namespace rts
                 sfg::Window::Ptr w = sfg::Window::Create();
                 w->SetTitle("Waiting...");
                 w->Add(hbox);
-                m_desktop.Add(w);
+                get_context().desktop->Add(w);
             }
         }
 
@@ -304,7 +316,7 @@ namespace rts
                 delete m_server;
                 m_server = nullptr;
                 m_state = CurrentState::SettingUp;
-                m_desktop.RemoveAll();
+                get_context().desktop->RemoveAll();
                 m_status_label.reset();
                 m_info = m_channel.get_server_info();
                 return;
@@ -340,7 +352,7 @@ namespace rts
 
             m_state = CurrentState::Playing;
 
-            std::uniform_int_distribution<sf::Uint16> pos_dist(0, m_size * 128);
+            std::uniform_int_distribution<sf::Uint16> pos_dist(0, m_size * 128 - 1);
 
             std::uniform_real_distribution<float> colour_dist(0, 1);
             float h = colour_dist(m_random);
@@ -358,11 +370,13 @@ namespace rts
             for(int i = 0; i < m_channel.num_players(); ++i)
                 m_player_turns.push_back(0);
             std::cerr << "Started a game for " << m_channel.num_players() << " players\n";
+
+            m_visibility.resize(m_size * m_size);
+            m_minion_tiles.resize(m_size * m_size);
         }
 
         void GameState::playing_update(sf::Time dt)
         {
-
             sf::Packet packet;
             sf::Uint8 playerid;
 
@@ -373,7 +387,8 @@ namespace rts
                 packet.clear();
                 packet << network::next_turn;
                 packet << m_commands.get_turn();
-                ASSERT(m_channel.send(packet) == sf::Socket::Done);
+                sf::Socket::Status status = m_channel.send(packet);
+                ASSERT(status == sf::Socket::Done);
             }
 
             while(m_channel.receive(packet, playerid) == sf::Socket::Done) {
@@ -436,6 +451,43 @@ namespace rts
 
             m_update_time += turn_time;
             update_input(dt);
+
+            for(auto &v : m_minion_tiles)
+                v.clear();
+
+            for(sf::Uint16 i = 0; i < m_minions.size(); ++i) {
+                auto &minion = m_minions[i];
+                if(minion.alive()) {
+                    m_minion_tiles.at((minion.get_y() / 128) * m_size + minion.get_x() / 128).push_back(i);
+                }
+            }
+
+            std::fill(m_visibility.begin(), m_visibility.end(), 0);
+
+            for(auto &minion : m_my_minions) {
+                sf::Uint16 x, y;
+                x = m_minions[minion].get_x() / 128;
+                y = m_minions[minion].get_y() / 128;
+                
+                m_visibility[(x + 0) + (y + 0) * m_size] = 2;
+                if(x < m_size)
+                    m_visibility[(x + 1) + (y + 0) * m_size] = 2;
+                if(y < m_size)
+                    m_visibility[(x + 0) + (y + 1) * m_size] = 2;
+                if(x > 0)
+                    m_visibility[(x - 1) + (y + 0) * m_size] = 2;
+                if(y > 0)
+                    m_visibility[(x + 0) + (y - 1) * m_size] = 2;
+
+                if(x < m_size && y < m_size)
+                    m_visibility[(x + 1) + (y + 1) * m_size] = std::max(m_visibility[(x + 1) + (y + 1) * m_size], (sf::Uint8)1);
+                if(x < m_size && y > 0)
+                    m_visibility[(x + 1) + (y - 1) * m_size] = std::max(m_visibility[(x + 1) + (y - 1) * m_size], (sf::Uint8)1);
+                if(x > 0 && y < m_size)
+                    m_visibility[(x - 1) + (y + 1) * m_size] = std::max(m_visibility[(x - 1) + (y + 1) * m_size], (sf::Uint8)1);
+                if(x > 0 && y > 0)
+                    m_visibility[(x - 1) + (y - 1) * m_size] = std::max(m_visibility[(x - 1) + (y - 1) * m_size], (sf::Uint8)1);
+            }
 
             for(auto &minion : m_minions) {
                 if(minion.alive())

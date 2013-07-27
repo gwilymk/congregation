@@ -14,6 +14,8 @@ namespace sf
     class RenderWindow;
 }
 
+namespace sfg { class Desktop; }
+
 namespace rts
 {
     class StateStack;
@@ -28,7 +30,7 @@ namespace rts
                 typedef std::unique_ptr<State> ptr;
 
                 struct Context {
-                    Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder, holders::ShaderHolder &shader_holder, holders::SoundHolder &sound_holder, holders::MusicHolder &music_holder, bool &focused);
+                    Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder, holders::ShaderHolder &shader_holder, holders::SoundHolder &sound_holder, holders::MusicHolder &music_holder, sfg::Desktop &desktop, bool &focused);
 
                     sf::RenderWindow *window;
                     holders::TextureHolder *texture_holder;
@@ -36,6 +38,7 @@ namespace rts
                     holders::ShaderHolder *shader_holder;
                     holders::SoundHolder *sound_holder;
                     holders::MusicHolder *music_holder;
+                    sfg::Desktop *desktop;
                     bool *focused;
                 };
 

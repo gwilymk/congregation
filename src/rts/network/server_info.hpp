@@ -11,8 +11,8 @@ namespace rts
 {
     namespace network
     {
-        const std::vector<std::string> sizes = { "Small", "Medium", "Large" };
-        const sf::Uint8 map_sizes[] = { 32, 48, 64 };
+        const std::vector<std::string> sizes = { "Tiny", "Small", "Medium", "Large", "Huge" };
+        const sf::Uint8 map_sizes[] = { 16, 32, 48, 64, 80 };
         const int max_players = 8;
         const int seed_size = 5;
 

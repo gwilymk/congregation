@@ -29,6 +29,7 @@ namespace rts
 
         private:
             sfg::SFGUI m_sfgui;
+            sfg::Desktop m_desktop;
             sf::RenderWindow m_render_window;
             holders::TextureHolder m_texture_holder;
             holders::FontHolder m_font_holder;

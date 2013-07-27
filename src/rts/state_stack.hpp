@@ -21,6 +21,7 @@ namespace rts
 
         public:
             explicit StateStack(states::State::Context context);
+            ~StateStack();
 
             template <class T> void register_state(states::ID stateID);
 

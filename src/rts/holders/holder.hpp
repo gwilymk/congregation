@@ -22,12 +22,15 @@ namespace rts
                 Resource &get(const std::string &name);
                 const Resource &get(const std::string &name) const;
 
+                std::string get_fname(const std::string &name) const;
+
                 template <typename Parameter>
                 void load(const std::string &name, const std::string &filename, const Parameter &second_param);
                 void load(const std::string &name, const std::string &filename);
 
             private:
                 std::unordered_map<std::string, std::unique_ptr<Resource>> m_resource_map;
+                std::unordered_map<std::string, std::string> m_fname_map;
         };
 
         typedef Holder<sf::Texture> TextureHolder;
