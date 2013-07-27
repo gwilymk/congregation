@@ -528,6 +528,9 @@ namespace rts
                             break;
                         case game::Command::COMMAND::PlacePiece:
                             m_tiles[command.place_piece.x + command.place_piece.y * m_size] = command.place_piece.tile;
+                            if(check_city(command.place_piece.x, command.place_piece.y)) {
+                                std::cerr << "New city!!\n";
+                            }
                             break;
                         case game::Command::COMMAND::Invalid:
                             done = true;
@@ -683,6 +686,98 @@ namespace rts
                 if(!check_direction(tile, m_tiles[(y + 1) * m_size + x], game::Tile::Orientation::SOUTH))
                     return false;
             return true;
+        }
+
+        game::Tile &GameState::get_tile(sf::Uint16 x, sf::Uint16 y)
+        {
+            ASSERT(x < m_size && y < m_size);
+            return m_tiles[x + y * m_size];
+        }
+
+        bool GameState::check_city(sf::Uint16 x, sf::Uint16 y)
+        {
+            game::Tile &tile = get_tile(x, y);
+            tile.check_time = m_commands.get_turn();
+            bool possible_city = false;
+
+            for(sf::Uint8 i = 0; i < 4; ++i) {
+                if(tile.get_feature((game::Tile::Orientation) i) == game::Tile::EdgeFeature::CITY) {
+                    possible_city = true;
+                    if(!check_city(x, y, (game::Tile::Orientation)i))
+                        return false;
+                }
+            }
+
+            return possible_city;
+        }
+
+        bool GameState::check_city(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction)
+        {
+            if(!direction_is_valid(x, y, direction))
+                return false;
+
+            switch(direction) {
+                case game::Tile::Orientation::NORTH:
+                    --y;
+                    break;
+                case game::Tile::Orientation::EAST:
+                    ++x;
+                    break;
+                case game::Tile::Orientation::SOUTH:
+                    ++y;
+                    break;
+                case game::Tile::Orientation::WEST:
+                    --x;
+                    break;
+            }
+
+            game::Tile &tile = get_tile(x, y);
+            game::Tile::Orientation opp_direction = (game::Tile::Orientation) ((direction + 2) % 4);
+            if(tile.get_feature(opp_direction) != game::Tile::EdgeFeature::CITY)
+                return false;
+            if(tile.check_time == m_commands.get_turn())
+                return true;
+            tile.check_time = m_commands.get_turn();
+
+            for(game::Tile::Orientation dir : tile.connected_to(opp_direction))
+                if(!check_city(x, y, dir))
+                    return false;
+
+            return true;
+        }
+
+        bool GameState::direction_is_valid(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction)
+        {
+            switch(direction) {
+                case game::Tile::Orientation::NORTH:
+                    return y != 0;
+                case game::Tile::Orientation::EAST:
+                    return x < m_size;
+                case game::Tile::Orientation::SOUTH:
+                    return y < m_size;
+                case game::Tile::Orientation::WEST:
+                    return x != 0;
+                default:
+                    return false;
+            }
+        }
+
+        game::Tile &GameState::tile_in_direction(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction)
+        {
+            ASSERT(direction_is_valid(x, y, direction));
+
+            switch(direction) {
+                case game::Tile::Orientation::NORTH:
+                    return get_tile(x, y - 1);
+                case game::Tile::Orientation::EAST:
+                    return get_tile(x + 1, y);
+                case game::Tile::Orientation::SOUTH:
+                    return get_tile(x, y + 1);
+                case game::Tile::Orientation::WEST:
+                    return get_tile(x - 1, y);
+                default:
+                    return get_tile(-1, -1);
+            }
         }
     }
 }

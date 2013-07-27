@@ -47,6 +47,13 @@ namespace rts
                 void send_command(game::Command command);
                 bool legal_move(game::Tile tile, sf::Uint16 x, sf::Uint16 y);
 
+                game::Tile &get_tile(sf::Uint16 x, sf::Uint16 y);
+                bool check_city(sf::Uint16 x, sf::Uint16 y);
+                bool check_city(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction);
+
+                bool direction_is_valid(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction);
+                game::Tile &tile_in_direction(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction);
+
             private:
                 bool m_lobby_done;
                 

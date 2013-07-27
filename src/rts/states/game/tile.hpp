@@ -23,6 +23,7 @@ namespace rts
 
                 Orientation orientation;
                 sf::Uint8 id;
+                sf::Uint32 check_time = -1;
 
                 bool has_watchtower();
                 EdgeFeature get_feature(Orientation direction);
