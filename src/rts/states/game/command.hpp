@@ -25,7 +25,7 @@ namespace rts
                     sf::Uint8 x;
                     sf::Uint8 y;
                     Tile tile;
-                } piece_place;
+                } place_piece;
                 struct {
                     std::vector<sf::Uint16> to_move;
                     sf::Uint16 x;

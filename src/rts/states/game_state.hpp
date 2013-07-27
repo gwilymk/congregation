@@ -75,6 +75,12 @@ namespace rts
                 std::set<int> m_free_list;
                 std::mt19937 m_random;
 
+                std::mt19937 m_tile_random;
+                std::uniform_int_distribution<sf::Uint8> m_tile_dist;
+                game::Tile m_next_tile;
+                sf::Sprite m_next_tile_sprite;
+                bool m_placing_tile = false;
+
                 sf::Uint8 m_my_player;
 
                 sf::Sprite m_selected_sprite;

@@ -86,6 +86,8 @@ namespace rts
             m_player_turns(),
             m_state(CurrentState::InLobby),
             m_selecting(false),
+            m_tile_dist(game::num_grass_tiles, game::num_tiles - 1),
+            m_next_tile_sprite(context.texture_holder->get("tiles")),
             m_selected_sprite(context.texture_holder->get("select_arrow")),
             m_minion_counter_sprite(context.texture_holder->get("minion counter")),
             m_tile_placement_box_sprite(context.texture_holder->get("tile placement box")),
@@ -100,6 +102,9 @@ namespace rts
             m_selected_sprite.setOrigin(12, 71);
             m_minion_counter_sprite.setPosition(16, 170);
             m_minion_counter_text.setPosition(86, 180);
+            m_next_tile_sprite.setOrigin(64, 64);
+
+            get_context().texture_holder->get("hud background").setRepeated(true);
         }
 
         GameState::~GameState()
@@ -153,6 +158,14 @@ namespace rts
             get_context().window->draw(m_minion_counter_sprite, m_minion_counter_shader);
             get_context().window->draw(m_minion_counter_text);
 
+            int tu = m_next_tile.id % 8;
+            int tv = m_next_tile.id / 8;
+            if(!m_placing_tile)
+                m_next_tile_sprite.setPosition(80, 80);
+            m_next_tile_sprite.setRotation(90 * m_next_tile.orientation);
+            m_next_tile_sprite.setTextureRect(sf::IntRect(tu * 128, tv * 128, 128, 128));
+            get_context().window->draw(m_next_tile_sprite);
+
             get_context().window->setView(m_view);
         }
 
@@ -201,66 +214,102 @@ namespace rts
                         view_size.y = window_size.y * 2.0;
                         m_view.setSize(view_size);
                     }
-                } else if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Button::Left) {
-                    if(event.mouseButton.x <= 160) {
-                        
-                    } else {
+                } else if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Button::Left && !m_placing_tile) {
+                    if(event.mouseButton.x > 160) {
                         m_select_end = m_select_start = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));                   
                         m_selecting = true;
                     }
-                } else if(m_selecting && event.type == sf::Event::MouseMoved) {
-                    m_select_end = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y));
-                } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Left) {
-                    if(!sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-                        for(auto &minion : m_my_minions)
-                            m_minions[minion].deselect();
-                    
-                    sf::Vector2i mousecoords(event.mouseButton.x, event.mouseButton.y);
-                    m_select_end = get_context().window->mapPixelToCoords(mousecoords);
+                } else if(event.type == sf::Event::MouseMoved) {
+                    if(m_placing_tile) {
+                        m_next_tile_sprite.setPosition(event.mouseMove.x, event.mouseMove.y);
+                    } else if(m_selecting) {
+                        m_select_end = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y));
+                    }
+                } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Left && !m_placing_tile) {
+                    sf::Vector2f positionf(event.mouseButton.x, event.mouseButton.y);
 
-                    if(m_select_start.x < m_select_end.x) {
-                        if(m_select_start.y > m_select_end.y) {
-                            sf::Vector2f tmp1, tmp2;
-                            tmp1.x = m_select_start.x;
-                            tmp1.y = m_select_end.y;
-                            tmp2.x = m_select_end.x;
-                            tmp2.y = m_select_start.y;
-
-                            m_select_start = tmp1;
-                            m_select_end = tmp2;
+                    if(event.mouseButton.x <= 160) {
+                        if(!m_placing_tile && !m_selecting) {
+                            if(m_next_tile_sprite.getLocalBounds().contains(positionf)) {
+                                m_placing_tile = true;
+                                std::cerr << "Placing tile" << std::endl;
+                            }
+                        } else {
+                            m_placing_tile = false;
                         }
                     } else {
-                        if(m_select_start.y > m_select_end.y) {
-                            std::swap(m_select_start, m_select_end);
-                        } else {
-                            sf::Vector2f tmp1, tmp2;
-                            tmp1.x = m_select_start.x;
-                            tmp1.y = m_select_end.y;
-                            tmp2.x = m_select_end.x;
-                            tmp2.y = m_select_start.y;
+                        if(!sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+                            for(auto &minion : m_my_minions)
+                                m_minions[minion].deselect();
 
-                            m_select_start = tmp2;
-                            m_select_end = tmp1;
+                        sf::Vector2i mousecoords(event.mouseButton.x, event.mouseButton.y);
+                        m_select_end = get_context().window->mapPixelToCoords(mousecoords);
+
+                        if(m_select_start.x < m_select_end.x) {
+                            if(m_select_start.y > m_select_end.y) {
+                                sf::Vector2f tmp1, tmp2;
+                                tmp1.x = m_select_start.x;
+                                tmp1.y = m_select_end.y;
+                                tmp2.x = m_select_end.x;
+                                tmp2.y = m_select_start.y;
+
+                                m_select_start = tmp1;
+                                m_select_end = tmp2;
+                            }
+                        } else {
+                            if(m_select_start.y > m_select_end.y) {
+                                std::swap(m_select_start, m_select_end);
+                            } else {
+                                sf::Vector2f tmp1, tmp2;
+                                tmp1.x = m_select_start.x;
+                                tmp1.y = m_select_end.y;
+                                tmp2.x = m_select_end.x;
+                                tmp2.y = m_select_start.y;
+
+                                m_select_start = tmp2;
+                                m_select_end = tmp1;
+                            }
+                        }
+
+                        sf::Vector2f size = m_select_end - m_select_start;
+                        sf::FloatRect rect = sf::FloatRect(m_select_start, size);
+                        bool rectangle_select = size.x * size.x + size.y * size.y > 10;
+
+                        for(auto minion : m_my_minions) {
+                            if(rectangle_select) {
+                                if(rect.intersects(m_minions[minion].get_bounds()))
+                                    m_minions[minion].toggle_selection();
+                            } else {
+                                if(m_minions[minion].get_bounds().contains(m_select_start))
+                                    m_minions[minion].toggle_selection();
+                            }
+                        }
+
+                        m_selecting = false;
+                    }
+                } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Left && m_placing_tile) {
+                    if(event.mouseButton.x <= 160)
+                        m_placing_tile = false;
+                    else {
+                        sf::Vector2f target = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+                        game::Command command;
+                        command.type = game::Command::COMMAND::PlacePiece;
+                        command.place_piece.x = target.x / 128;
+                        command.place_piece.y = target.y / 128;
+                        if(command.place_piece.x < m_size && command.place_piece.y < m_size) {
+                            command.place_piece.tile = m_next_tile;
+                            if(m_visibility[command.place_piece.x + command.place_piece.y * m_size] == 2) {
+                                send_command(command);
+                                m_placing_tile = false;
+                                m_next_tile.id = m_tile_dist(m_tile_random);
+                                m_next_tile.orientation = game::Tile::Orientation::NORTH;
+                            }
                         }
                     }
-
-                    sf::Vector2f size = m_select_end - m_select_start;
-                    sf::FloatRect rect = sf::FloatRect(m_select_start, size);
-                    bool rectangle_select = size.x * size.x + size.y * size.y > 10;
-                    
-                    for(auto minion : m_my_minions) {
-                        if(rectangle_select) {
-                            if(rect.intersects(m_minions[minion].get_bounds()))
-                                m_minions[minion].toggle_selection();
-                        } else {
-                            if(m_minions[minion].get_bounds().contains(m_select_start))
-                                m_minions[minion].toggle_selection();
-                        }
-                    }
-
-                    m_selecting = false;
                 } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Right) {
-                    if(event.mouseButton.x > 160) {
+                    if(m_placing_tile)
+                        m_placing_tile = false;
+                    else if(event.mouseButton.x > 160) {
                         game::Command command;
                         command.type = game::Command::COMMAND::MoveUnits;
                         for(auto minion : m_my_minions) {
@@ -271,9 +320,19 @@ namespace rts
 
                         if(!command.unit_move.to_move.empty()) {
                             sf::Vector2f target = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
-                            command.unit_move.x = target.x;
-                            command.unit_move.y = target.y;
-                            send_command(command);
+                            if(target.x > 0 && target.x < m_size * 128 && target.y > 0 && target.y < m_size * 128) {
+                                command.unit_move.x = target.x;
+                                command.unit_move.y = target.y;
+                                send_command(command);
+                            }
+                        }
+                    }
+                } else if(event.type == sf::Event::KeyPressed) {
+                    if(m_placing_tile) {
+                        if(event.key.code == sf::Keyboard::Q) {
+                            m_next_tile.orientation = (game::Tile::Orientation) ((m_next_tile.orientation + 3) % 4);
+                        } else if(event.key.code == sf::Keyboard::E) {
+                            m_next_tile.orientation = (game::Tile::Orientation) ((m_next_tile.orientation + 1) % 4);
                         }
                     }
                 }
@@ -350,7 +409,7 @@ namespace rts
 
             for(int i = 0 ; i < m_size * m_size ; ++i) {
                 sf::Uint8 tileid = grass_dist(m_random);
-                if(tileid > 4) tileid = 4;
+                if(tileid >= game::num_grass_tiles) tileid = game::num_grass_tiles - 1;
                 m_tiles[i] = game::Tile(tileid, (game::Tile::Orientation)orientation_dist(m_random));
             }
 
@@ -387,6 +446,10 @@ namespace rts
                 if(i == m_my_player)
                     m_view.setCenter(x_coord, y_coord);
             }
+
+            std::random_device rd;
+            m_tile_random.seed(rd());
+            m_next_tile.id = m_tile_dist(m_tile_random);
 
             for(int i = 0; i < m_channel.num_players(); ++i)
                 m_player_turns.push_back(0);
@@ -460,6 +523,8 @@ namespace rts
                             for(auto minion : command.unit_move.to_move)
                                 m_minions[minion].move_to(command.unit_move.x, command.unit_move.y);
                         case game::Command::COMMAND::PlacePiece:
+                            std::cerr << "Going to place a piece with id " << (unsigned) command.place_piece.tile.id << " at (" << (unsigned)command.place_piece.x << ", " << (unsigned)command.place_piece.y << ")\n";
+                            m_tiles[command.place_piece.x + command.place_piece.y * m_size] = command.place_piece.tile;
                             break;
                         case game::Command::COMMAND::Invalid:
                             done = true;

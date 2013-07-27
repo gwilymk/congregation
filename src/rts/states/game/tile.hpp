@@ -10,6 +10,9 @@ namespace rts
     {
         namespace game
         {
+            const int num_grass_tiles = 5;
+            const int num_tiles = 32;
+
             struct Tile
             {
                 enum Orientation : sf::Uint8 { NORTH, EAST, SOUTH, WEST };
