@@ -26,6 +26,8 @@ namespace rts
 
                 bool has_watchtower();
                 EdgeFeature get_feature(Orientation direction);
+
+                std::vector<Orientation> connected_to(Orientation direction);
             };
 
             sf::Packet &operator<<(sf::Packet &packet, const Tile &tile);
