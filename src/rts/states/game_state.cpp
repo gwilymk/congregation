@@ -75,13 +75,16 @@ namespace rts
             m_minion_counter_sprite(context.texture_holder->get("minion counter")),
             m_tile_placement_box_sprite(context.texture_holder->get("tile placement box")),
             m_hud_background_sprite(context.texture_holder->get("hud background")),
-            m_minion_counter_text("0", context.font_holder->get("font"))
+            m_minion_counter_text("0", context.font_holder->get("font")),
+            m_minion_counter_shader(&context.shader_holder->get("minion"))
         {
             m_lobby = new game::Lobby(&m_lobby_done);
             m_lobby->add_to_desktop(m_desktop);
 
             m_view = get_context().window->getView();
             m_selected_sprite.setOrigin(12, 71);
+            m_minion_counter_sprite.setPosition(16, 170);
+            m_minion_counter_text.setPosition(86, 180);
         }
 
         GameState::~GameState()
@@ -130,6 +133,9 @@ namespace rts
             m_hud_background_sprite.setTextureRect(view_recti);
             get_context().window->draw(m_hud_background_sprite);
             get_context().window->draw(m_tile_placement_box_sprite);
+            m_minion_counter_shader->setParameter("minion_colour", m_player_colours[m_my_player]);
+            get_context().window->draw(m_minion_counter_sprite, m_minion_counter_shader);
+            get_context().window->draw(m_minion_counter_text);
 
             get_context().window->setView(m_view);
         }
@@ -359,6 +365,8 @@ namespace rts
 
             sf::Packet packet;
             sf::Uint8 playerid;
+
+            m_minion_counter_text.setString(number_to_string(m_my_minions.size()));
 
             if(m_update_time > turn_time && m_finished_current_turn == false) {
                 m_finished_current_turn = true;

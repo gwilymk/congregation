@@ -80,6 +80,7 @@ namespace rts
                 sf::Sprite m_tile_placement_box_sprite;
                 sf::Sprite m_hud_background_sprite;
                 sf::Text m_minion_counter_text;
+                sf::Shader *m_minion_counter_shader;
 
                 sf::View m_view;
         };
