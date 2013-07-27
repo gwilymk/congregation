@@ -303,12 +303,6 @@ namespace rts
                                 m_placing_tile = false;
                                 m_next_tile.id = m_tile_dist(m_tile_random);
                                 m_next_tile.orientation = game::Tile::Orientation::NORTH;
-
-                                std::cerr << "Next tile (" << (unsigned) m_next_tile.id << ") has features ";
-                                for(int i = 0; i < 4; ++i) {
-                                    std::cerr << (int) m_next_tile.get_feature((game::Tile::Orientation)i) << " ";
-                                }
-                                std::cerr << std::endl;
                             }
                         }
                     }
@@ -525,12 +519,10 @@ namespace rts
 
                     switch(command.type) {
                         case game::Command::COMMAND::MoveUnits:
-                            std::cerr << "Moving " << command.unit_move.to_move.size() << " minion(s) to " << command.unit_move.x << ", " << command.unit_move.y << std::endl;
                             for(auto minion : command.unit_move.to_move)
                                 m_minions[minion].move_to(command.unit_move.x, command.unit_move.y);
                             break;
                         case game::Command::COMMAND::PlacePiece:
-                            std::cerr << "Going to place a piece with id " << (unsigned) command.place_piece.tile.id << " at (" << (unsigned)command.place_piece.x << ", " << (unsigned)command.place_piece.y << ")\n";
                             m_tiles[command.place_piece.x + command.place_piece.y * m_size] = command.place_piece.tile;
                             break;
                         case game::Command::COMMAND::Invalid:
