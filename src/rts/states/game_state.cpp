@@ -125,13 +125,17 @@ namespace rts
 
             get_context().window->draw(array, &get_context().texture_holder->get("tiles"));
 
-            for(auto &minion : m_minions) {
-                if(minion.alive()) {
-                    if(m_visibility.at(minion.get_x() / 128 + (minion.get_y() / 128) * m_size) == 2)
-                        get_context().window->draw(minion);
-                    if(minion.selected()) {
-                        m_selected_sprite.setPosition(minion.get_x(), minion.get_y());
-                        get_context().window->draw(m_selected_sprite);
+            for(auto &tile : m_minion_tiles) {
+                if(tile.empty()) continue;
+                for(sf::Uint16 minion_id : tile) {
+                    auto &minion = m_minions[minion_id];
+                    if(minion.alive()) {
+                        if(m_visibility.at(minion.get_x() / 128 + (minion.get_y() / 128) * m_size) == 2)
+                            get_context().window->draw(minion);
+                        if(minion.selected()) {
+                            m_selected_sprite.setPosition(minion.get_x(), minion.get_y());
+                            get_context().window->draw(m_selected_sprite);
+                        }
                     }
                 }
             }
