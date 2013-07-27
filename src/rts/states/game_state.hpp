@@ -45,6 +45,7 @@ namespace rts
                 void kill_minion(sf::Uint16 id);
 
                 void send_command(game::Command command);
+                bool legal_move(game::Tile tile, sf::Uint16 x, sf::Uint16 y);
 
             private:
                 bool m_lobby_done;

@@ -232,7 +232,6 @@ namespace rts
                         if(!m_placing_tile && !m_selecting) {
                             if(m_next_tile_sprite.getLocalBounds().contains(positionf)) {
                                 m_placing_tile = true;
-                                std::cerr << "Placing tile" << std::endl;
                             }
                         } else {
                             m_placing_tile = false;
@@ -299,11 +298,17 @@ namespace rts
                         if(command.place_piece.x < m_size && command.place_piece.y < m_size) {
                             command.place_piece.tile = m_next_tile;
                             unsigned position_id = command.place_piece.x + command.place_piece.y * m_size;
-                            if(m_visibility[position_id] == 2 && m_tiles[position_id].id < game::num_grass_tiles) {
+                            if(m_visibility[position_id] == 2 && m_tiles[position_id].id < game::num_grass_tiles && legal_move(m_next_tile, command.place_piece.x, command.place_piece.y)) {
                                 send_command(command);
                                 m_placing_tile = false;
                                 m_next_tile.id = m_tile_dist(m_tile_random);
                                 m_next_tile.orientation = game::Tile::Orientation::NORTH;
+
+                                std::cerr << "Next tile (" << (unsigned) m_next_tile.id << ") has features ";
+                                for(int i = 0; i < 4; ++i) {
+                                    std::cerr << (int) m_next_tile.get_feature((game::Tile::Orientation)i) << " ";
+                                }
+                                std::cerr << std::endl;
                             }
                         }
                     }
@@ -523,6 +528,7 @@ namespace rts
                             std::cerr << "Moving " << command.unit_move.to_move.size() << " minion(s) to " << command.unit_move.x << ", " << command.unit_move.y << std::endl;
                             for(auto minion : command.unit_move.to_move)
                                 m_minions[minion].move_to(command.unit_move.x, command.unit_move.y);
+                            break;
                         case game::Command::COMMAND::PlacePiece:
                             std::cerr << "Going to place a piece with id " << (unsigned) command.place_piece.tile.id << " at (" << (unsigned)command.place_piece.x << ", " << (unsigned)command.place_piece.y << ")\n";
                             m_tiles[command.place_piece.x + command.place_piece.y * m_size] = command.place_piece.tile;
@@ -654,6 +660,33 @@ namespace rts
             packet << network::add_command;
             packet << command;
             ASSERT(m_channel.send(packet) == sf::Socket::Done);
+        }
+
+        static bool check_direction(game::Tile tileA, game::Tile tileB, game::Tile::Orientation direction)
+        {
+            if(!(tileA.get_feature(direction) == tileB.get_feature((game::Tile::Orientation) ((direction + 2) % 4)) || tileB.id < game::num_grass_tiles)) {
+                std::cerr << "Cannot place " << (unsigned) tileA.id << " with orientation " << (unsigned) tileA.orientation << " because its " << tileA.get_feature(direction) << " collides with " << (unsigned) tileB.id << "'s feature " << (unsigned)tileB.get_feature((game::Tile::Orientation) ((direction + 2) % 4)) << std::endl;
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        bool GameState::legal_move(game::Tile tile, sf::Uint16 x, sf::Uint16 y)
+        {
+            if(x > 0) 
+                if(!check_direction(tile, m_tiles[(x - 1) + y * m_size], game::Tile::Orientation::WEST))
+                    return false;
+            if(x < m_size)
+                if(!check_direction(tile, m_tiles[(x + 1) + y * m_size], game::Tile::Orientation::EAST))
+                    return false;
+            if(y > 0) 
+                if(!check_direction(tile, m_tiles[(y - 1) * m_size + x], game::Tile::Orientation::NORTH))
+                    return false;
+            if(y < m_size)
+                if(!check_direction(tile, m_tiles[(y + 1) * m_size + x], game::Tile::Orientation::SOUTH))
+                    return false;
+            return true;
         }
     }
 }

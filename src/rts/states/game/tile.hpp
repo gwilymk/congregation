@@ -16,11 +16,16 @@ namespace rts
             struct Tile
             {
                 enum Orientation : sf::Uint8 { NORTH, EAST, SOUTH, WEST };
+                enum EdgeFeature { GRASS, ROAD, CITY };
+
                 Tile();
                 Tile(sf::Uint8 id, Orientation orientation);
 
                 Orientation orientation;
                 sf::Uint8 id;
+
+                bool has_watchtower();
+                EdgeFeature get_feature(Orientation direction);
             };
 
             sf::Packet &operator<<(sf::Packet &packet, const Tile &tile);
