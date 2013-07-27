@@ -16,6 +16,7 @@ add_executable(${EXECUTABLE_NAME}
     src/main.cpp
     src/rts/application.cpp
     src/rts/common.cpp
+    src/rts/holders/music_holder.cpp
     src/rts/lua/state.cpp
     src/rts/network/channel.cpp
     src/rts/network/server.cpp

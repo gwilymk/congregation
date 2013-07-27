@@ -1,6 +1,7 @@
 #include "loading_state.hpp"
 #include "rts/state_stack.hpp"
 #include "rts/states/id.hpp"
+#include "rts/holders/music_holder.hpp"
 
 namespace rts 
 {
@@ -50,6 +51,30 @@ namespace rts
                 return 0;
             });
             m_lua_state.set_field(-2, "load_shader");
+
+            m_lua_state.push<std::function<int(lua_State *)>>(
+            [this] (lua_State *L_raw) -> int {
+                lua::State L(L_raw);
+                ASSERT(L.get_top() == 2);
+                std::string name = L.get<std::string>(1);
+                std::string fname = L.get<std::string>(2);
+
+                get_context().sound_holder->load(name, fname);
+                return 0;
+            });
+            m_lua_state.set_field(-2, "load_sound");
+
+            m_lua_state.push<std::function<int(lua_State *)>>(
+            [this] (lua_State *L_raw) -> int {
+                lua::State L(L_raw);
+                ASSERT(L.get_top() == 2);
+                std::string name = L.get<std::string>(1);
+                std::string fname = L.get<std::string>(2);
+
+                get_context().music_holder->load(name, fname);
+                return 0;
+            });
+            m_lua_state.set_field(-2, "load_music");
 
             m_lua_state.set_global("rts");
         }

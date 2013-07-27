@@ -1,6 +1,6 @@
 print "Loading resources"
 
-import load_texture, load_font, load_shader from rts
+import load_texture, load_font, load_shader, load_music, load_sound from rts
 
 export resource = (tbl) ->
     print "Loading #{tbl.name} (#{tbl.filename})"
@@ -11,6 +11,10 @@ export resource = (tbl) ->
             load_texture tbl.name, "../res/" .. tbl.filename, tbl.smooth
         when "shader"
             load_shader tbl.name, "../res/" .. tbl.vertex, "../res/" .. tbl.fragment
+        when "music"
+            load_music tbl.name, "../res/" .. tbl.filename
+        when "sound"
+            load_sound tbl.name, "../res/" .. tbl.filename
         else
             print "Error, unknown type #{tbl.type}"
             error 1
@@ -26,15 +30,16 @@ load_resource = (filename) ->
 
 resource_files = {
     "fonts/font.lua"
+    "music/theme_music.lua"
     "shaders/minion.lua"
     "textures/hats.lua"
     "textures/hud_background.lua"
     "textures/minion_counter.lua"
     "textures/minion.lua"
-    "textures/tiles.lua"
     "textures/select_arrow.lua"
-    "textures/title.lua"
     "textures/tile_placement_box.lua"
+    "textures/tiles.lua"
+    "textures/title.lua"
 }
 
 for res in *resource_files

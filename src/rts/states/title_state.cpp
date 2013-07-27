@@ -1,6 +1,7 @@
 #include "title_state.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
+#include "rts/holders/music_holder.hpp"
 
 #include <cmath>
 
@@ -16,6 +17,7 @@ namespace rts
         {
             float x = (get_context().window->getSize().x - m_text.getLocalBounds().width) / 2.0;
             float y = (get_context().window->getSize().y - m_text.getLocalBounds().height) / 2.0;
+            get_context().music_holder->play("theme");
             m_text.setPosition(x, y);
         }
 
@@ -39,6 +41,9 @@ namespace rts
                 case sf::Event::KeyPressed:
                     request_stack_pop();
                     request_stack_push(ID::MainMenuState);
+                    break;
+                case sf::Event::Closed:
+                    request_stack_pop();
                 default:
                     break;
             }
