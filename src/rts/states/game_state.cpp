@@ -273,13 +273,7 @@ namespace rts
                             sf::Vector2f target = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
                             command.unit_move.x = target.x;
                             command.unit_move.y = target.y;
-                            command.turn = m_commands.get_turn() + game::num_turns_to_store;
-
-                            m_commands.add_command(command);
-                            sf::Packet packet;
-                            packet << network::add_command;
-                            packet << command;
-                            ASSERT(m_channel.send(packet) == sf::Socket::Done);
+                            send_command(command);
                         }
                     }
                 }
@@ -583,6 +577,17 @@ namespace rts
         {
             m_minions[id].kill();
             m_free_list.insert(id);
+        }
+
+        void GameState::send_command(game::Command command)
+        {
+            command.turn = m_commands.get_turn() + game::num_turns_to_store;
+
+            m_commands.add_command(command);
+            sf::Packet packet;
+            packet << network::add_command;
+            packet << command;
+            ASSERT(m_channel.send(packet) == sf::Socket::Done);
         }
     }
 }

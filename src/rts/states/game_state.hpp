@@ -44,6 +44,8 @@ namespace rts
                 void create_minion(sf::Uint16 x, sf::Uint16 y, sf::Uint8 player_num);
                 void kill_minion(sf::Uint16 id);
 
+                void send_command(game::Command command);
+
             private:
                 bool m_lobby_done;
                 
