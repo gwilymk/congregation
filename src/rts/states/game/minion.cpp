@@ -12,7 +12,7 @@ namespace rts
     {
         namespace game
         {
-            Minion::Minion(sf::Uint8 hatid, sf::Color colour, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader):
+            Minion::Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color colour, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader):
                 m_x(x),
                 m_y(y),
                 m_hatid(hatid),
@@ -20,6 +20,7 @@ namespace rts
                 m_frame(0),
                 m_frame_time(frame_length),
                 m_direction(2),
+                m_playerid(playerid),
                 m_moving(false),
                 m_alive(true),
                 m_selected(false),
@@ -72,6 +73,11 @@ namespace rts
             void Minion::deselect()
             {
                 m_selected = false;
+            }
+
+            sf::Uint8 Minion::get_playerid() const
+            {
+                return m_playerid;
             }
 
             void Minion::update(int millis)

@@ -23,7 +23,7 @@ namespace rts
                 public:
                     enum { NO_HAT = 254 };
 
-                    Minion(sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader);
+                    Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader);
 
                     void update(int millis);
 
@@ -42,6 +42,8 @@ namespace rts
                     void deselect();
                     void toggle_selection();
 
+                    sf::Uint8 get_playerid() const;
+
                     void move_to(sf::Uint16 x, sf::Uint16 y);
 
                     sf::FloatRect get_bounds() const;
@@ -58,6 +60,8 @@ namespace rts
                     sf::Uint8 m_frame;
                     sf::Time m_frame_time;
                     sf::Uint8 m_direction;
+
+                    sf::Uint8 m_playerid;
 
                     bool m_moving;
                     bool m_alive;

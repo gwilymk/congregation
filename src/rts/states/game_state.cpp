@@ -429,8 +429,8 @@ namespace rts
             }
 
             for(int i = 0; i < m_channel.num_players(); ++i) {
-                sf::Uint16 x_coord;
-                sf::Uint16 y_coord;
+                sf::Uint16 x_coord = 0;
+                sf::Uint16 y_coord = 0;
 
                 if(start_positions[i][0] == 0) x_coord = 128 * 4;
                 else if(start_positions[i][0] == 1) x_coord = m_size / 2;
@@ -634,7 +634,7 @@ namespace rts
             sf::Uint8 hatid = hat_dist(m_random);
             if(hatid >= 9)
                 hatid = game::Minion::NO_HAT;
-            game::Minion minion(hatid, m_player_colours[player_num], x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"), &get_context().shader_holder->get("minion"));
+            game::Minion minion(player_num, hatid, m_player_colours[player_num], x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"), &get_context().shader_holder->get("minion"));
 
             sf::Uint16 minionid;
 
@@ -655,6 +655,10 @@ namespace rts
 
         void GameState::kill_minion(sf::Uint16 id)
         {
+            if(m_minions[id].get_playerid() == m_my_player) {
+                m_my_minions.erase(std::find(m_my_minions.begin(), m_my_minions.end(), id));
+            }
+
             m_minions[id].kill();
             m_free_list.insert(id);
         }
