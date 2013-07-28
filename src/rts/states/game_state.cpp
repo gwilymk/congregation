@@ -580,11 +580,11 @@ namespace rts
                     }
 
                     if(completed_city) {
-                        std::cerr << m_counter << " Standing on a completed city" << std::endl;
-
-                        check_city(x, y, direction, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y) { light_up(x, y, 1, 2); });
-                        for(auto dir : tile.connected_to(direction)) {
-                            check_city(x, y, dir, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y) { light_up(x, y, 1, 2); });
+                        if(minion.get_playerid() == m_my_player) {
+                            check_city(x, y, direction, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y) { light_up(x, y, 1, 2); });
+                            for(auto dir : tile.connected_to(direction)) {
+                                check_city(x, y, dir, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y) { light_up(x, y, 1, 2); });
+                            }
                         }
                     }
                 }
