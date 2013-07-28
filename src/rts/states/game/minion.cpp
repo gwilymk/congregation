@@ -84,7 +84,7 @@ namespace rts
             {
                 sf::Time dt = sf::milliseconds(millis);
 
-                m_moving = m_path.move(m_x, m_y, 3, m_direction);
+                m_moving = m_path.move(m_x, m_y, 15, m_direction);
 
                 if(m_moving) {
                     m_frame_time += dt;

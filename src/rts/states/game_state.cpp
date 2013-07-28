@@ -11,6 +11,7 @@ namespace
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
     const sf::Time turn_time = sf::milliseconds(200);
+    const sf::Uint16 minion_respawn_time = 5000;
     const int millis_per_update = 1000 / 30;
 
     const int start_positions[rts::network::max_players][2] = {
@@ -498,7 +499,6 @@ namespace rts
                     std::cerr << "====================================================================\n";
                     std::cerr << "==============    Got a false command ==============================\n";
                     std::cerr << "============== " << message << " ===================================\n";
-                    while(true);
                     ASSERT(false);
                 }
 
@@ -556,7 +556,7 @@ namespace rts
                 y = minion.get_y() / 128;
 
                 if(minion.alive()) {
-                    m_minion_tiles.at(get_id(x, y)).push_back(i);
+                    m_minion_tiles[get_id(x, y)].push_back(i);
                 }
 
                 if(minion.get_playerid() == m_my_player) {
@@ -576,19 +576,64 @@ namespace rts
                 game::Tile &tile = get_tile(x, y);
                 game::Tile::Orientation direction = tile.get_direction(minion.get_x() % 128, minion.get_y() % 128);
                 if(tile.get_feature(direction) == game::Tile::CITY) {
-                    bool completed_city = check_city(x, y, direction, ++m_counter);
-                    for(auto dir : tile.connected_to(direction)) {
-                        if(!check_city(x, y, dir, ++m_counter)) {
-                            completed_city = false;
+                    if(minion.get_playerid() == m_my_player) {
+                        check_city(x, y, direction, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation) { light_up(x, y, 1, 2); });
+                        for(auto dir : tile.connected_to(direction)) {
+                            check_city(x, y, dir, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation) { light_up(x, y, 1, 2); });
                         }
                     }
+                }
+            }
 
-                    if(completed_city) {
-                        if(minion.get_playerid() == m_my_player) {
-                            check_city(x, y, direction, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y) { light_up(x, y, 1, 2); });
-                            for(auto dir : tile.connected_to(direction)) {
-                                check_city(x, y, dir, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y) { light_up(x, y, 1, 2); });
+            m_minion_respawn_timer += millis_per_update;
+
+            if(m_minion_respawn_timer >= minion_respawn_time) {
+                m_minion_respawn_timer -= minion_respawn_time;
+
+                for(auto &minion : m_minions) {
+                    if(minion.check_city_turn == m_commands.get_turn())
+                        continue;
+                    sf::Uint16 x = minion.get_x() / 128, y = minion.get_y() / 128;
+                    game::Tile &tile = get_tile(x, y);
+                    game::Tile::Orientation direction = tile.get_direction(minion.get_x() % 128, minion.get_y() % 128);
+                    if(tile.get_feature(direction) == game::Tile::CITY) {
+                        bool should_spawn = true;
+                        std::set<sf::Uint16> checked_ids;
+                        auto func = [&] (sf::Uint16 tile_x, sf::Uint16 tile_y, game::Tile::Orientation dir) {
+                            sf::Uint16 id = get_id(tile_x, tile_y);
+                            for(sf::Uint16 m : m_minion_tiles[id]) {
+                                if(m_tiles[id].get_direction(m_minions[m].get_x() % 128, m_minions[m].get_y() % 128) == dir) {
+                                    if(m_minions[m].get_playerid() != minion.get_playerid()) {
+                                        should_spawn = false;
+                                        m_minions[m].check_city_turn = m_commands.get_turn();
+                                        minion.check_city_turn = m_commands.get_turn();
+                                    } else if(m_minions[m].check_city_turn == m_commands.get_turn()) {
+                                        should_spawn = false;
+                                    } 
+                                }
                             }
+                            checked_ids.insert(id);
+                        };
+
+                        bool completed_city = check_city(x, y, direction, ++m_counter);
+                        for(auto dir : tile.connected_to(direction)) {
+                            if(!check_city(x, y, dir, ++m_counter)) {
+                                completed_city = false;
+                            }
+                        }
+
+                        if(completed_city) {
+                            check_city(x, y, direction, ++m_counter, func);
+                            for(auto dir : tile.connected_to(direction)) 
+                                check_city(x, y, dir, ++m_counter, func);
+
+                            if(should_spawn) {
+                                for(sf::Uint16 id : checked_ids) {
+                                    sf::Uint16 x = id % m_size;
+                                    sf::Uint16 y = (id - x) / m_size;
+                                    create_minion(x * 128 + 64, y * 128 + 64, minion.get_playerid());
+                                }
+                            } 
                         }
                     }
                 }
@@ -710,7 +755,7 @@ namespace rts
             return m_tiles[get_id(x, y)];
         }
 
-        bool GameState::check_city(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction, sf::Uint32 time, std::function<void(sf::Uint16 x, sf::Uint16 y)> function)
+        bool GameState::check_city(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction, sf::Uint32 time, std::function<void(sf::Uint16, sf::Uint16, game::Tile::Orientation direction)> function)
         {
             if(!direction_is_valid(x, y, direction))
                 return false;
@@ -738,14 +783,17 @@ namespace rts
                 return tile.cache;
             tile.check_time = time;
 
-            for(game::Tile::Orientation dir : tile.connected_to(opp_direction))
+            if(function)
+                function(x, y, opp_direction);
+
+            for(game::Tile::Orientation dir : tile.connected_to(opp_direction)) {
+                if(function)
+                    function(x, y, dir);
                 if(!check_city(x, y, dir, time, function)) {
                     tile.cache = false;
                     return false;
                 }
-
-            if(function)
-                function(x, y);
+            }
             tile.cache = true;
             return true;
         }

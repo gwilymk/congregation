@@ -8,6 +8,7 @@ namespace rts
     {
         void __debug_break_here()
         {
+            while(true);
         }
 
         void fail(const char *code, const char *file, int line)

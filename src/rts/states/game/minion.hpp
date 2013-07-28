@@ -48,6 +48,9 @@ namespace rts
 
                     sf::FloatRect get_bounds() const;
 
+                public:
+                    sf::Uint32 check_city_turn = -1;
+
                 private:
                     void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
@@ -66,7 +69,7 @@ namespace rts
                     bool m_moving;
                     bool m_alive;
                     bool m_selected;
-                    
+
                     sf::Texture *m_texture;
                     sf::Texture *m_hat_texture;
                     sf::Shader *m_shader;
