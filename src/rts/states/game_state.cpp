@@ -559,33 +559,33 @@ namespace rts
                     x = minion.get_x() / 128;
                     y = minion.get_y() / 128;
                     
-                    m_visibility[(x + 0) + (y + 0) * m_size] = 2;
-                    if(x < m_size)
-                        m_visibility[(x + 1) + (y + 0) * m_size] = 2;
-                    if(y < m_size)
-                        m_visibility[(x + 0) + (y + 1) * m_size] = 2;
+                    m_visibility[get_id(x, y)] = 2;
+                    if(x < m_size - 1)
+                        m_visibility[get_id(x + 1, y)] = 2;
+                    if(y < m_size - 1)
+                        m_visibility[get_id(x, y + 1)] = 2;
                     if(x > 0)
-                        m_visibility[(x - 1) + (y + 0) * m_size] = 2;
+                        m_visibility[get_id(x - 1, y)] = 2;
                     if(y > 0)
-                        m_visibility[(x + 0) + (y - 1) * m_size] = 2;
+                        m_visibility[get_id(x, y - 1)] = 2;
 
                     if(x < m_size - 1 && y < m_size)
-                        m_visibility[(x + 1) + (y + 1) * m_size] = std::max(m_visibility[(x + 1) + (y + 1) * m_size], (sf::Uint8)1);
+                        m_visibility[get_id(x + 1, y + 1)] = std::max(m_visibility[get_id(x + 1, y + 1)], (sf::Uint8)1);
                     if(x < m_size - 1 && y > 0)
-                        m_visibility[(x + 1) + (y - 1) * m_size] = std::max(m_visibility[(x + 1) + (y - 1) * m_size], (sf::Uint8)1);
+                        m_visibility[get_id(x + 1, y - 1)] = std::max(m_visibility[get_id(x + 1, y - 1)], (sf::Uint8)1);
                     if(x > 0 && y < m_size)
-                        m_visibility[(x - 1) + (y + 1) * m_size] = std::max(m_visibility[(x - 1) + (y + 1) * m_size], (sf::Uint8)1);
+                        m_visibility[get_id(x - 1, y + 1)] = std::max(m_visibility[get_id(x - 1, y + 1)], (sf::Uint8)1);
                     if(x > 0 && y > 0)
-                        m_visibility[(x - 1) + (y - 1) * m_size] = std::max(m_visibility[(x - 1) + (y - 1) * m_size], (sf::Uint8)1);
+                        m_visibility[get_id(x - 1, y - 1)] = std::max(m_visibility[get_id(x - 1, y - 1)], (sf::Uint8)1);
 
                     if(x > 1)
-                        m_visibility[(x - 2) + y * m_size] = std::max(m_visibility[(x - 2) + y * m_size], (sf::Uint8)1);
+                        m_visibility[get_id(x - 2, y)] = std::max(m_visibility[get_id(x - 2, y)], (sf::Uint8)1);
                     if(x < m_size - 2)
-                        m_visibility[(x + 2) + y * m_size] = std::max(m_visibility[(x + 2) + y * m_size], (sf::Uint8)1);
+                        m_visibility[get_id(x + 2, y)] = std::max(m_visibility[get_id(x + 2, y)], (sf::Uint8)1);
                     if(y > 1)
-                        m_visibility[x + (y - 2) * m_size] = std::max(m_visibility[x + (y - 2) * m_size], (sf::Uint8)1);
+                        m_visibility[get_id(x, y - 2)] = std::max(m_visibility[get_id(x, y - 2)], (sf::Uint8)1);
                     if(y < m_size - 2)
-                        m_visibility[x + (y + 2) * m_size] = std::max(m_visibility[x + (y + 2) * m_size], (sf::Uint8)1);
+                        m_visibility[get_id(x, y + 2)] = std::max(m_visibility[get_id(x, y + 2)], (sf::Uint8)1);
                 }
             }
 
@@ -702,8 +702,7 @@ namespace rts
 
         game::Tile &GameState::get_tile(sf::Uint16 x, sf::Uint16 y)
         {
-            ASSERT(x < m_size && y < m_size);
-            return m_tiles[x + y * m_size];
+            return m_tiles[get_id(x, y)];
         }
 
         bool GameState::check_city(sf::Uint16 x, sf::Uint16 y)
@@ -790,6 +789,12 @@ namespace rts
                 default:
                     return get_tile(-1, -1);
             }
+        }
+
+        sf::Uint16 GameState::get_id(sf::Uint16 x, sf::Uint16 y) const
+        {
+            ASSERT(x < m_size && y < m_size);
+            return x + y * m_size;
         }
     }
 }

@@ -54,6 +54,8 @@ namespace rts
                 bool direction_is_valid(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction);
                 game::Tile &tile_in_direction(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction);
 
+                sf::Uint16 get_id(sf::Uint16 x, sf::Uint16 y) const;
+
             private:
                 bool m_lobby_done;
                 
