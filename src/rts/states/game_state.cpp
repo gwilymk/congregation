@@ -11,7 +11,7 @@ namespace
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
     const sf::Time turn_time = sf::milliseconds(200);
-    const sf::Uint16 minion_respawn_time = 5000;
+    const sf::Uint16 minion_respawn_time = 20000;
     const int millis_per_update = 1000 / 30;
 
     const int start_positions[rts::network::max_players][2] = {
