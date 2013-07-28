@@ -674,16 +674,16 @@ namespace rts
         bool GameState::legal_move(game::Tile tile, sf::Uint16 x, sf::Uint16 y)
         {
             if(x > 0) 
-                if(!check_direction(tile, m_tiles[(x - 1) + y * m_size], game::Tile::Orientation::WEST))
+                if(!check_direction(tile, get_tile(x - 1, y), game::Tile::Orientation::WEST))
                     return false;
             if(x < m_size)
-                if(!check_direction(tile, m_tiles[(x + 1) + y * m_size], game::Tile::Orientation::EAST))
+                if(!check_direction(tile, get_tile(x + 1, y), game::Tile::Orientation::EAST))
                     return false;
             if(y > 0) 
-                if(!check_direction(tile, m_tiles[(y - 1) * m_size + x], game::Tile::Orientation::NORTH))
+                if(!check_direction(tile, get_tile(x, y - 1), game::Tile::Orientation::NORTH))
                     return false;
             if(y < m_size)
-                if(!check_direction(tile, m_tiles[(y + 1) * m_size + x], game::Tile::Orientation::SOUTH))
+                if(!check_direction(tile, get_tile(x, y + 1), game::Tile::Orientation::SOUTH))
                     return false;
             return true;
         }
