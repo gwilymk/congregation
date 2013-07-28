@@ -562,8 +562,8 @@ namespace rts
                     sf::Uint16 view_distance;
                     sf::Uint16 fade_distance;
                     if(m_tiles[get_id(x, y)].has_watchtower()) {
-                        fade_distance = 7;
-                        view_distance = 5;
+                        fade_distance = 5;
+                        view_distance = 4;
                     } else {
                         view_distance = 1;
                         fade_distance = 2;
