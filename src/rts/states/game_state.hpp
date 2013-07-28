@@ -48,13 +48,14 @@ namespace rts
                 bool legal_move(game::Tile tile, sf::Uint16 x, sf::Uint16 y);
 
                 game::Tile &get_tile(sf::Uint16 x, sf::Uint16 y);
-                bool check_city(sf::Uint16 x, sf::Uint16 y);
-                bool check_city(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction);
+                bool check_city(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction, sf::Uint32 time, std::function<void(sf::Uint16 x, sf::Uint16 y)> function = std::function<void(sf::Uint16 x, sf::Uint16 y)>());
 
                 bool direction_is_valid(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction);
                 game::Tile &tile_in_direction(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction);
 
                 sf::Uint16 get_id(sf::Uint16 x, sf::Uint16 y) const;
+
+                void light_up(sf::Uint16 x, sf::Uint16 y, sf::Uint16 view_dist, sf::Uint16 fade_dist);
 
             private:
                 bool m_lobby_done;
@@ -67,6 +68,7 @@ namespace rts
                 sf::Time m_update_time;
                 bool m_finished_current_turn = false;
                 std::vector<sf::Uint32> m_player_turns;
+                sf::Uint32 m_counter = 0;
 
                 CurrentState m_state;
 

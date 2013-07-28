@@ -37,11 +37,14 @@ add_library("${EXECUTABLE_NAME}lib"
 add_executable(${EXECUTABLE_NAME} 
     src/main.cpp
 )
-
+add_executable(test
+    src/test.cpp
+)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2 COMPONENTS audio graphics window network system REQUIRED)
 set(SFGUI_STATIC_LIBRARIES TRUE)
 find_package(SFGUI REQUIRED)
 find_package(Lua51 REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} "${EXECUTABLE_NAME}lib" ${SFGUI_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES})
+target_link_libraries(test "${EXECUTABLE_NAME}lib" ${SFGUI_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(${SFML_INCULDE_DIR} ${SFGUI_INCLUDE_DIR} ${LUA_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src)

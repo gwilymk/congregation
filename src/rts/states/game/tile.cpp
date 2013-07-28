@@ -1,4 +1,5 @@
 #include "tile.hpp"
+#include "rts/common.hpp"
 #include <set>
 
 namespace
@@ -48,41 +49,41 @@ namespace
     };
 
     sf::Uint8 connections[num_tiles][3] = {
-        {0, 1, 2},
-        {0, 1, 2},
-        {0, 1, 2},
-        {0, 1, 2},
-        {0, 1, 2},
-        {0, 1, 2},
-        {1, 3, 2},
+        {1, 2, 3},
+        {1, 2, 3},
+        {1, 2, 3},
+        {1, 2, 3},
+        {1, 2, 3},
+        {2, 1, 3},
+        {1, 3, 3},
         {1, 2, 3},
 
-        {3, 1, 2},
+        {3, 2, 2},
         {0, 3, 2},
         {0, 3, 2},
         {1, 2, 3},
         {2, 3, 2},
-        {0, 3, 2},
+        {2, 3, 2},
         {1, 3, 2},
-        {1, 1, 2},
+        {1, 1, 3},
 
         {3, 2, 2},
-        {0, 1, 2},
         {0, 2, 2},
-        {0, 1, 2},
+        {0, 2, 2},
         {0, 3, 2},
-        {0, 1, 2},
+        {0, 3, 2},
+        {0, 2, 3},
         {0, 2, 2},
         {0, 1, 3},
 
         {0, 3, 2},
         {0, 2, 3},
+        {2, 1, 2},
         {0, 1, 2},
-        {0, 1, 2},
-        {1, 1, 2},
-        {0, 3, 2},
-        {0, 1, 2},
-        {0, 1, 2},
+        {1, 1, 3},
+        {2, 3, 2},
+        {1, 3, 2},
+        {1, 2, 3},
     };
 }
 
@@ -106,7 +107,7 @@ namespace rts
 
             Tile::EdgeFeature Tile::get_feature(Orientation direction)
             {
-                return tile_features[id][(int)(direction + 4 - orientation) % 4];
+                return tile_features[id][(sf::Uint8)(direction + 4 - orientation) % 4];
             }
 
             bool Tile::has_watchtower()
@@ -140,6 +141,38 @@ namespace rts
                 }
 
                 return ret;
+            }
+
+            static Tile::Orientation simple_direction(sf::Uint16 x, sf::Uint16 y)
+            {
+                sf::Uint16 dist0, dist1, dist2, dist3;
+                sf::Uint16 minimum;
+                minimum = dist0 = y;
+                dist1 = 128 - x;
+                minimum = minimum > dist1 ? dist1 : minimum;
+                dist2 = 128 - y;
+                minimum = minimum > dist2 ? dist2 : minimum;
+                dist3 = x;
+                minimum = minimum > dist3 ? dist3 : minimum;
+
+                if(minimum == dist0)
+                    return Tile::Orientation::NORTH;
+                if(minimum == dist1)
+                    return Tile::Orientation::EAST;
+                if(minimum == dist2)
+                    return Tile::Orientation::SOUTH;
+                if(minimum == dist3)
+                    return Tile::Orientation::WEST;
+
+                ASSERT(false);
+                return Tile::Orientation::NORTH;
+            }
+
+            Tile::Orientation Tile::get_direction(sf::Uint16 x, sf::Uint16 y) const
+            {
+                ASSERT(x < 128 && y < 128);
+
+                return simple_direction(x, y);
             }
 
             sf::Packet &operator<<(sf::Packet &packet, const Tile &tile)

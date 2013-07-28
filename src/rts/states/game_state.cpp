@@ -528,9 +528,6 @@ namespace rts
                             break;
                         case game::Command::COMMAND::PlacePiece:
                             m_tiles[command.place_piece.x + command.place_piece.y * m_size] = command.place_piece.tile;
-                            if(check_city(command.place_piece.x, command.place_piece.y)) {
-                                std::cerr << "New city!!\n";
-                            }
                             break;
                         case game::Command::COMMAND::Invalid:
                             done = true;
@@ -568,20 +565,26 @@ namespace rts
                         view_distance = 1;
                         fade_distance = 2;
                     }
+                    
+                    light_up(x, y, view_distance, fade_distance);
+                }
+                
+                game::Tile &tile = get_tile(x, y);
+                game::Tile::Orientation direction = tile.get_direction(minion.get_x() % 128, minion.get_y() % 128);
+                if(tile.get_feature(direction) == game::Tile::CITY) {
+                    bool completed_city = check_city(x, y, direction, ++m_counter);
+                    for(auto dir : tile.connected_to(direction)) {
+                        if(!check_city(x, y, dir, ++m_counter)) {
+                            completed_city = false;
+                        }
+                    }
 
-                    sf::Uint16 fade_dist_sq = fade_distance * fade_distance;
-                    sf::Uint16 view_dist_sq = view_distance * view_distance;
+                    if(completed_city) {
+                        std::cerr << m_counter << " Standing on a completed city" << std::endl;
 
-                    for(sf::Uint16 i = x - fade_distance; i != x + fade_distance + 1; ++i) {
-                        for(sf::Uint16 j = y - fade_distance; j != y + fade_distance + 1; ++j) {
-                            if(i >= m_size || j >= m_size)
-                                continue;
-
-                            sf::Uint16 dist_sq = (i - x) * (i - x) + (j - y) * (j - y);
-                            if(dist_sq <= view_dist_sq)
-                                m_visibility[get_id(i, j)] = 2;
-                            else if(dist_sq <= fade_dist_sq) 
-                                m_visibility[get_id(i, j)] = std::max(m_visibility[get_id(i, j)], (sf::Uint8)1);
+                        check_city(x, y, direction, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y) { light_up(x, y, 1, 2); });
+                        for(auto dir : tile.connected_to(direction)) {
+                            check_city(x, y, dir, ++m_counter, [this] (sf::Uint16 x, sf::Uint16 y) { light_up(x, y, 1, 2); });
                         }
                     }
                 }
@@ -703,24 +706,7 @@ namespace rts
             return m_tiles[get_id(x, y)];
         }
 
-        bool GameState::check_city(sf::Uint16 x, sf::Uint16 y)
-        {
-            game::Tile &tile = get_tile(x, y);
-            tile.check_time = m_commands.get_turn();
-            bool possible_city = false;
-
-            for(sf::Uint8 i = 0; i < 4; ++i) {
-                if(tile.get_feature((game::Tile::Orientation) i) == game::Tile::EdgeFeature::CITY) {
-                    possible_city = true;
-                    if(!check_city(x, y, (game::Tile::Orientation)i))
-                        return false;
-                }
-            }
-
-            return possible_city;
-        }
-
-        bool GameState::check_city(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction)
+        bool GameState::check_city(sf::Uint16 x, sf::Uint16 y, game::Tile::Orientation direction, sf::Uint32 time, std::function<void(sf::Uint16 x, sf::Uint16 y)> function)
         {
             if(!direction_is_valid(x, y, direction))
                 return false;
@@ -744,14 +730,19 @@ namespace rts
             game::Tile::Orientation opp_direction = (game::Tile::Orientation) ((direction + 2) % 4);
             if(tile.get_feature(opp_direction) != game::Tile::EdgeFeature::CITY)
                 return false;
-            if(tile.check_time == m_commands.get_turn())
-                return true;
-            tile.check_time = m_commands.get_turn();
+            if(tile.check_time == time)
+                return tile.cache;
+            tile.check_time = time;
 
             for(game::Tile::Orientation dir : tile.connected_to(opp_direction))
-                if(!check_city(x, y, dir))
+                if(!check_city(x, y, dir, time, function)) {
+                    tile.cache = false;
                     return false;
+                }
 
+            if(function)
+                function(x, y);
+            tile.cache = true;
             return true;
         }
 
@@ -793,6 +784,25 @@ namespace rts
         {
             ASSERT(x < m_size && y < m_size);
             return x + y * m_size;
+        }
+
+        void GameState::light_up(sf::Uint16 x, sf::Uint16 y, sf::Uint16 view_distance, sf::Uint16 fade_distance)
+        {
+            sf::Uint16 fade_dist_sq = fade_distance * fade_distance;
+            sf::Uint16 view_dist_sq = view_distance * view_distance;
+
+            for(sf::Uint16 i = x - fade_distance; i != x + fade_distance + 1; ++i) {
+                for(sf::Uint16 j = y - fade_distance; j != y + fade_distance + 1; ++j) {
+                    if(i >= m_size || j >= m_size)
+                        continue;
+
+                    sf::Uint16 dist_sq = (i - x) * (i - x) + (j - y) * (j - y);
+                    if(dist_sq <= view_dist_sq)
+                        m_visibility[get_id(i, j)] = 2;
+                    else if(dist_sq <= fade_dist_sq) 
+                        m_visibility[get_id(i, j)] = std::max(m_visibility[get_id(i, j)], (sf::Uint8)1);
+                }
+            }
         }
     }
 }

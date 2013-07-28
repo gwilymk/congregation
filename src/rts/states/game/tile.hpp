@@ -24,9 +24,12 @@ namespace rts
                 Orientation orientation;
                 sf::Uint8 id;
                 sf::Uint32 check_time = -1;
+                bool cache = false;
 
                 bool has_watchtower();
                 EdgeFeature get_feature(Orientation direction);
+
+                Orientation get_direction(sf::Uint16 x, sf::Uint16 y) const;
 
                 std::vector<Orientation> connected_to(Orientation direction);
             };
