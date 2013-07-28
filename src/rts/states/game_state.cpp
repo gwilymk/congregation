@@ -676,13 +676,13 @@ namespace rts
             if(x > 0) 
                 if(!check_direction(tile, get_tile(x - 1, y), game::Tile::Orientation::WEST))
                     return false;
-            if(x < m_size)
+            if(x < m_size - 1)
                 if(!check_direction(tile, get_tile(x + 1, y), game::Tile::Orientation::EAST))
                     return false;
             if(y > 0) 
                 if(!check_direction(tile, get_tile(x, y - 1), game::Tile::Orientation::NORTH))
                     return false;
-            if(y < m_size)
+            if(y < m_size - 1)
                 if(!check_direction(tile, get_tile(x, y + 1), game::Tile::Orientation::SOUTH))
                     return false;
             return true;

@@ -70,7 +70,7 @@ namespace rts
 
                 sfg::Label::Ptr m_status_label;
 
-                int m_size;
+                sf::Uint16 m_size;
                 bool m_selecting;
                 sf::Vector2f m_select_start;
                 sf::Vector2f m_select_end;
