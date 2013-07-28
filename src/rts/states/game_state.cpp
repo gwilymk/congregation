@@ -550,42 +550,40 @@ namespace rts
 
             for(sf::Uint16 i = 0; i < m_minions.size(); ++i) {
                 auto &minion = m_minions[i];
+                sf::Uint16 x, y;
+                x = minion.get_x() / 128;
+                y = minion.get_y() / 128;
+
                 if(minion.alive()) {
-                    m_minion_tiles.at((minion.get_y() / 128) * m_size + minion.get_x() / 128).push_back(i);
+                    m_minion_tiles.at(get_id(x, y)).push_back(i);
                 }
 
                 if(minion.get_playerid() == m_my_player) {
-                    sf::Uint16 x, y;
-                    x = minion.get_x() / 128;
-                    y = minion.get_y() / 128;
-                    
-                    m_visibility[get_id(x, y)] = 2;
-                    if(x < m_size - 1)
-                        m_visibility[get_id(x + 1, y)] = 2;
-                    if(y < m_size - 1)
-                        m_visibility[get_id(x, y + 1)] = 2;
-                    if(x > 0)
-                        m_visibility[get_id(x - 1, y)] = 2;
-                    if(y > 0)
-                        m_visibility[get_id(x, y - 1)] = 2;
+                    sf::Uint16 view_distance;
+                    sf::Uint16 fade_distance;
+                    if(m_tiles[get_id(x, y)].has_watchtower()) {
+                        fade_distance = 7;
+                        view_distance = 5;
+                    } else {
+                        view_distance = 1;
+                        fade_distance = 2;
+                    }
 
-                    if(x < m_size - 1 && y < m_size)
-                        m_visibility[get_id(x + 1, y + 1)] = std::max(m_visibility[get_id(x + 1, y + 1)], (sf::Uint8)1);
-                    if(x < m_size - 1 && y > 0)
-                        m_visibility[get_id(x + 1, y - 1)] = std::max(m_visibility[get_id(x + 1, y - 1)], (sf::Uint8)1);
-                    if(x > 0 && y < m_size)
-                        m_visibility[get_id(x - 1, y + 1)] = std::max(m_visibility[get_id(x - 1, y + 1)], (sf::Uint8)1);
-                    if(x > 0 && y > 0)
-                        m_visibility[get_id(x - 1, y - 1)] = std::max(m_visibility[get_id(x - 1, y - 1)], (sf::Uint8)1);
+                    sf::Uint16 fade_dist_sq = fade_distance * fade_distance;
+                    sf::Uint16 view_dist_sq = view_distance * view_distance;
 
-                    if(x > 1)
-                        m_visibility[get_id(x - 2, y)] = std::max(m_visibility[get_id(x - 2, y)], (sf::Uint8)1);
-                    if(x < m_size - 2)
-                        m_visibility[get_id(x + 2, y)] = std::max(m_visibility[get_id(x + 2, y)], (sf::Uint8)1);
-                    if(y > 1)
-                        m_visibility[get_id(x, y - 2)] = std::max(m_visibility[get_id(x, y - 2)], (sf::Uint8)1);
-                    if(y < m_size - 2)
-                        m_visibility[get_id(x, y + 2)] = std::max(m_visibility[get_id(x, y + 2)], (sf::Uint8)1);
+                    for(sf::Uint16 i = x - fade_distance; i != x + fade_distance + 1; ++i) {
+                        for(sf::Uint16 j = y - fade_distance; j != y + fade_distance + 1; ++j) {
+                            if(i >= m_size || j >= m_size)
+                                continue;
+
+                            sf::Uint16 dist_sq = (i - x) * (i - x) + (j - y) * (j - y);
+                            if(dist_sq <= view_dist_sq)
+                                m_visibility[get_id(i, j)] = 2;
+                            else if(dist_sq <= fade_dist_sq) 
+                                m_visibility[get_id(i, j)] = std::max(m_visibility[get_id(i, j)], (sf::Uint8)1);
+                        }
+                    }
                 }
             }
 
