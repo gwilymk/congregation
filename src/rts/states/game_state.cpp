@@ -495,6 +495,10 @@ namespace rts
                     packet >> command;
                     m_commands.add_command(command);
                 } else {
+                    std::cerr << "====================================================================\n";
+                    std::cerr << "==============    Got a false command ==============================\n";
+                    std::cerr << "============== " << message << " ===================================\n";
+                    while(true);
                     ASSERT(false);
                 }
 
