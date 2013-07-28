@@ -27,7 +27,7 @@ namespace rts
                 bool cache = false;
 
                 bool has_watchtower();
-                EdgeFeature get_feature(Orientation direction);
+                EdgeFeature get_feature(Orientation direction) const;
 
                 Orientation get_direction(sf::Uint16 x, sf::Uint16 y) const;
 

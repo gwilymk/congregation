@@ -80,11 +80,11 @@ namespace rts
                 return m_playerid;
             }
 
-            void Minion::update(int millis)
+            void Minion::update(int millis, const std::vector<Tile> &tiles)
             {
                 sf::Time dt = sf::milliseconds(millis);
 
-                m_moving = m_path.move(m_x, m_y, 15, m_direction);
+                m_moving = m_path.move(m_x, m_y, tiles, m_direction);
 
                 if(m_moving) {
                     m_frame_time += dt;
@@ -112,9 +112,9 @@ namespace rts
                 m_selected = !m_selected;
             }
 
-            void Minion::move_to(sf::Uint16 x, sf::Uint16 y)
+            void Minion::move_to(sf::Uint16 x, sf::Uint16 y, const std::vector<Tile> &tiles, sf::Uint16 map_size)
             {
-                m_path = Path(x, y);
+                m_path = Path(m_x, m_y, x, y, tiles, map_size);
             }
 
             void Minion::draw(sf::RenderTarget &target, sf::RenderStates states) const

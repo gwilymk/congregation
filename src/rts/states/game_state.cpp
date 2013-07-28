@@ -528,7 +528,7 @@ namespace rts
                     switch(command.type) {
                         case game::Command::COMMAND::MoveUnits:
                             for(auto minion : command.unit_move.to_move)
-                                m_minions[minion].move_to(command.unit_move.x, command.unit_move.y);
+                                m_minions[minion].move_to(command.unit_move.x, command.unit_move.y, m_tiles, m_size);
                             break;
                         case game::Command::COMMAND::PlacePiece:
                             m_tiles[command.place_piece.x + command.place_piece.y * m_size] = command.place_piece.tile;
@@ -641,7 +641,7 @@ namespace rts
 
             for(auto &minion : m_minions) {
                 if(minion.alive())
-                    minion.update(millis_per_update);
+                    minion.update(millis_per_update, m_tiles);
             }
 
             sf::Vector2f size = m_view.getSize();
@@ -804,9 +804,9 @@ namespace rts
                 case game::Tile::Orientation::NORTH:
                     return y != 0;
                 case game::Tile::Orientation::EAST:
-                    return x < m_size;
+                    return x < m_size - 1;
                 case game::Tile::Orientation::SOUTH:
-                    return y < m_size;
+                    return y < m_size - 1;
                 case game::Tile::Orientation::WEST:
                     return x != 0;
                 default:

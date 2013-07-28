@@ -11,6 +11,7 @@
 
 #include <SFML/Config.hpp>
 #include "rts/states/game/path.hpp"
+#include "rts/states/game/tile.hpp"
 
 namespace rts
 {
@@ -25,7 +26,7 @@ namespace rts
 
                     Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader);
 
-                    void update(int millis);
+                    void update(int millis, const std::vector<Tile> &tiles);
 
                     sf::Uint16 get_x() const;
                     sf::Uint16 get_y() const;;
@@ -44,7 +45,7 @@ namespace rts
 
                     sf::Uint8 get_playerid() const;
 
-                    void move_to(sf::Uint16 x, sf::Uint16 y);
+                    void move_to(sf::Uint16 x, sf::Uint16 y, const std::vector<Tile> &tiles, sf::Uint16 map_size);
 
                     sf::FloatRect get_bounds() const;
 

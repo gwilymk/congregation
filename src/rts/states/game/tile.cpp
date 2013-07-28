@@ -105,7 +105,7 @@ namespace rts
             {
             }
 
-            Tile::EdgeFeature Tile::get_feature(Orientation direction)
+            Tile::EdgeFeature Tile::get_feature(Orientation direction) const
             {
                 return tile_features[id][(sf::Uint8)(direction + 4 - orientation) % 4];
             }
