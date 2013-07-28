@@ -546,48 +546,47 @@ namespace rts
 
             for(auto &v : m_minion_tiles)
                 v.clear();
+            std::fill(m_visibility.begin(), m_visibility.end(), 0);
 
             for(sf::Uint16 i = 0; i < m_minions.size(); ++i) {
                 auto &minion = m_minions[i];
                 if(minion.alive()) {
                     m_minion_tiles.at((minion.get_y() / 128) * m_size + minion.get_x() / 128).push_back(i);
                 }
-            }
 
-            std::fill(m_visibility.begin(), m_visibility.end(), 0);
+                if(minion.get_playerid() == m_my_player) {
+                    sf::Uint16 x, y;
+                    x = minion.get_x() / 128;
+                    y = minion.get_y() / 128;
+                    
+                    m_visibility[(x + 0) + (y + 0) * m_size] = 2;
+                    if(x < m_size)
+                        m_visibility[(x + 1) + (y + 0) * m_size] = 2;
+                    if(y < m_size)
+                        m_visibility[(x + 0) + (y + 1) * m_size] = 2;
+                    if(x > 0)
+                        m_visibility[(x - 1) + (y + 0) * m_size] = 2;
+                    if(y > 0)
+                        m_visibility[(x + 0) + (y - 1) * m_size] = 2;
 
-            for(auto &minion : m_my_minions) {
-                sf::Uint16 x, y;
-                x = m_minions[minion].get_x() / 128;
-                y = m_minions[minion].get_y() / 128;
-                
-                m_visibility[(x + 0) + (y + 0) * m_size] = 2;
-                if(x < m_size)
-                    m_visibility[(x + 1) + (y + 0) * m_size] = 2;
-                if(y < m_size)
-                    m_visibility[(x + 0) + (y + 1) * m_size] = 2;
-                if(x > 0)
-                    m_visibility[(x - 1) + (y + 0) * m_size] = 2;
-                if(y > 0)
-                    m_visibility[(x + 0) + (y - 1) * m_size] = 2;
+                    if(x < m_size - 1 && y < m_size)
+                        m_visibility[(x + 1) + (y + 1) * m_size] = std::max(m_visibility[(x + 1) + (y + 1) * m_size], (sf::Uint8)1);
+                    if(x < m_size - 1 && y > 0)
+                        m_visibility[(x + 1) + (y - 1) * m_size] = std::max(m_visibility[(x + 1) + (y - 1) * m_size], (sf::Uint8)1);
+                    if(x > 0 && y < m_size)
+                        m_visibility[(x - 1) + (y + 1) * m_size] = std::max(m_visibility[(x - 1) + (y + 1) * m_size], (sf::Uint8)1);
+                    if(x > 0 && y > 0)
+                        m_visibility[(x - 1) + (y - 1) * m_size] = std::max(m_visibility[(x - 1) + (y - 1) * m_size], (sf::Uint8)1);
 
-                if(x < m_size - 1 && y < m_size)
-                    m_visibility[(x + 1) + (y + 1) * m_size] = std::max(m_visibility[(x + 1) + (y + 1) * m_size], (sf::Uint8)1);
-                if(x < m_size - 1 && y > 0)
-                    m_visibility[(x + 1) + (y - 1) * m_size] = std::max(m_visibility[(x + 1) + (y - 1) * m_size], (sf::Uint8)1);
-                if(x > 0 && y < m_size)
-                    m_visibility[(x - 1) + (y + 1) * m_size] = std::max(m_visibility[(x - 1) + (y + 1) * m_size], (sf::Uint8)1);
-                if(x > 0 && y > 0)
-                    m_visibility[(x - 1) + (y - 1) * m_size] = std::max(m_visibility[(x - 1) + (y - 1) * m_size], (sf::Uint8)1);
-
-                if(x > 1)
-                    m_visibility[(x - 2) + y * m_size] = std::max(m_visibility[(x - 2) + y * m_size], (sf::Uint8)1);
-                if(x < m_size - 2)
-                    m_visibility[(x + 2) + y * m_size] = std::max(m_visibility[(x + 2) + y * m_size], (sf::Uint8)1);
-                if(y > 1)
-                    m_visibility[x + (y - 2) * m_size] = std::max(m_visibility[x + (y - 2) * m_size], (sf::Uint8)1);
-                if(y < m_size - 2)
-                    m_visibility[x + (y + 2) * m_size] = std::max(m_visibility[x + (y + 2) * m_size], (sf::Uint8)1);
+                    if(x > 1)
+                        m_visibility[(x - 2) + y * m_size] = std::max(m_visibility[(x - 2) + y * m_size], (sf::Uint8)1);
+                    if(x < m_size - 2)
+                        m_visibility[(x + 2) + y * m_size] = std::max(m_visibility[(x + 2) + y * m_size], (sf::Uint8)1);
+                    if(y > 1)
+                        m_visibility[x + (y - 2) * m_size] = std::max(m_visibility[x + (y - 2) * m_size], (sf::Uint8)1);
+                    if(y < m_size - 2)
+                        m_visibility[x + (y + 2) * m_size] = std::max(m_visibility[x + (y + 2) * m_size], (sf::Uint8)1);
+                }
             }
 
             for(auto &minion : m_minions) {
