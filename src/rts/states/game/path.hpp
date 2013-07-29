@@ -19,6 +19,7 @@ namespace rts
                     Path(sf::Uint16 startx, sf::Uint16 starty, sf::Uint16 destx, sf::Uint16 desty, const std::vector<Tile> &tiles, sf::Uint16 map_size);
 
                     bool move(sf::Uint16 &x, sf::Uint16 &y, const std::vector<Tile> &tiles, sf::Uint8 &direction);
+                    sf::Uint16 get_map_size() const;
 
                 private:
                     bool do_move(sf::Uint16 &x, sf::Uint16 &y, sf::Uint8 &direction, sf::Uint16 targetx, sf::Uint16 targety, sf::Uint16 speed);

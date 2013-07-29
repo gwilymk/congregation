@@ -41,6 +41,11 @@ namespace
 
         return  sf::Color(r * 256, g * 256, b * 256);
     }
+
+    template<typename T> T difference(T a, T b)
+    {
+        return (a > b) ? a - b : b - a;
+    }
 }
 
 namespace rts
@@ -655,6 +660,49 @@ namespace rts
             for(auto &minion : m_minions) {
                 if(minion.alive())
                     minion.update(millis_per_update, m_tiles);
+            }
+
+            for(auto &minion_list : m_minion_tiles) {
+                std::vector<std::pair<sf::Uint16, sf::IntRect>> collisions;
+                for(sf::Uint16 minion : minion_list) {
+                    collisions.emplace_back(minion, m_minions[minion].get_collision_bounds());
+                }
+                sf::Uint16 size = collisions.size();
+                for(sf::Uint16 i = 0; i < size; ++i) {
+                    for(sf::Uint16 j = i + 1; j < size; ++j) {
+                        if(collisions[i].second.intersects(collisions[j].second)) {
+                            sf::Uint16 disth = difference(collisions[i].second.left, collisions[j].second.left);
+                            sf::Uint16 distv = difference(collisions[i].second.top, collisions[j].second.top);
+                            sf::Uint16 idi = collisions[i].first, idj = collisions[j].first;
+
+                            if(distv > disth) {
+                                if(collisions[i].second.top > collisions[j].second.top) {
+                                    if(m_minions[idi].get_y() < m_size)
+                                        m_minions[idi].set_y(m_minions[idi].get_y() + 1);
+                                    if(m_minions[idj].get_y() != 0)
+                                        m_minions[idj].set_y(m_minions[idj].get_y() - 1);
+                                } else {
+                                    if(m_minions[idj].get_y() < m_size)
+                                        m_minions[idj].set_y(m_minions[idj].get_y() + 1);
+                                    if(m_minions[idi].get_y() != 0)
+                                        m_minions[idi].set_y(m_minions[idi].get_y() - 1);
+                                }
+                            } else {
+                                if(collisions[i].second.left > collisions[j].second.left) {
+                                    if(m_minions[idi].get_x() < m_size)
+                                        m_minions[idi].set_x(m_minions[idi].get_x() + 1);
+                                    if(m_minions[idj].get_x() != 0)
+                                        m_minions[idj].set_x(m_minions[idj].get_x() - 1);
+                                } else {
+                                    if(m_minions[idj].get_x() < m_size)
+                                        m_minions[idj].set_x(m_minions[idj].get_x() + 1);
+                                    if(m_minions[idi].get_x() != 0)
+                                        m_minions[idi].set_x(m_minions[idi].get_x() - 1);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             sf::Vector2f size = m_view.getSize();

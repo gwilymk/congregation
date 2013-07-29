@@ -94,6 +94,7 @@ namespace rts
                         m_frame_time -= frame_length;
                     }
                 } else {
+                    m_path = Path(m_path.get_map_size());
                     m_frame = 0;
                 }
             }
@@ -106,6 +107,11 @@ namespace rts
             sf::FloatRect Minion::get_bounds() const
             {
                 return sf::FloatRect(get_x() - 16, get_y() - 39, 32, 48);
+            }
+
+            sf::IntRect Minion::get_collision_bounds() const
+            {
+                return sf::IntRect(get_x() - 16 + 6, get_y() - 32 + 24, 21, 24);
             }
 
             void Minion::toggle_selection()
@@ -137,8 +143,6 @@ namespace rts
                 m_shader->setParameter("texture", sf::Shader::CurrentTexture);
                 m_shader->setParameter("minion_colour", m_colour);
                 target.draw(va, states);
-
-                return;
 
                 if(m_hatid == NO_HAT)
                     return;

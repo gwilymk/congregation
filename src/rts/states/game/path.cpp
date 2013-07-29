@@ -201,6 +201,11 @@ namespace rts
 
                 return true;
             }
+
+            sf::Uint16 Path::get_map_size() const
+            {
+                return m_map_size;
+            }
         }
     }
 }

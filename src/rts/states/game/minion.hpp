@@ -48,6 +48,7 @@ namespace rts
                     void move_to(sf::Uint16 x, sf::Uint16 y, const std::vector<Tile> &tiles, sf::Uint16 map_size);
 
                     sf::FloatRect get_bounds() const;
+                    sf::IntRect get_collision_bounds() const;
 
                 public:
                     sf::Uint32 check_city_turn = -1;
