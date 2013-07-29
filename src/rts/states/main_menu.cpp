@@ -14,9 +14,6 @@ namespace rts
             sfg::Button::Ptr b2 = sfg::Button::Create("Play");
             b2->GetSignal(sfg::Button::OnLeftClick).Connect(&MainMenuState::start_multiplayer, this);
             m_box->Pack(b2);
-            sfg::Button::Ptr b3 = sfg::Button::Create("Settings");
-            b3->GetSignal(sfg::Button::OnLeftClick).Connect(&MainMenuState::settings, this);
-            m_box->Pack(b3);
             sfg::Button::Ptr b4 = sfg::Button::Create("Quit");
             b4->GetSignal(sfg::Button::OnLeftClick).Connect(&MainMenuState::request_stack_pop, (State *)this);
             m_box->Pack(b4);
