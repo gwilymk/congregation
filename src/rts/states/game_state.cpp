@@ -669,35 +669,39 @@ namespace rts
                 }
                 sf::Uint16 size = collisions.size();
                 for(sf::Uint16 i = 0; i < size; ++i) {
-                    for(sf::Uint16 j = i + 1; j < size; ++j) {
+                    for(sf::Uint16 j = 0; j < size; ++j) {
+                        if(i == j) continue;
                         if(collisions[i].second.intersects(collisions[j].second)) {
-                            sf::Uint16 disth = difference(collisions[i].second.left, collisions[j].second.left);
-                            sf::Uint16 distv = difference(collisions[i].second.top, collisions[j].second.top);
                             sf::Uint16 idi = collisions[i].first, idj = collisions[j].first;
 
+                            auto &mi = m_minions[idi];
+                            auto &mj = m_minions[idj];
+                            sf::Uint16 disth = difference(mi.get_collision_bounds().left, mj.get_collision_bounds().left);
+                            sf::Uint16 distv = difference(mi.get_collision_bounds().top, mj.get_collision_bounds().top);
+
                             if(distv > disth) {
-                                if(collisions[i].second.top > collisions[j].second.top) {
-                                    if(m_minions[idi].get_y() < m_size)
-                                        m_minions[idi].set_y(m_minions[idi].get_y() + 1);
-                                    if(m_minions[idj].get_y() != 0)
-                                        m_minions[idj].set_y(m_minions[idj].get_y() - 1);
+                                if(mi.get_collision_bounds().top > mj.get_collision_bounds().top) {
+                                    if(mi.get_y() < m_size && !mi.is_moving())
+                                        mi.set_y(mi.get_y() + 1);
+                                    if(mj.get_y() != 0 && !mj.is_moving())
+                                        mj.set_y(mj.get_y() - 1);
                                 } else {
-                                    if(m_minions[idj].get_y() < m_size)
-                                        m_minions[idj].set_y(m_minions[idj].get_y() + 1);
-                                    if(m_minions[idi].get_y() != 0)
-                                        m_minions[idi].set_y(m_minions[idi].get_y() - 1);
+                                    if(mj.get_y() < m_size && !mj.is_moving())
+                                        mj.set_y(mj.get_y() + 1);
+                                    if(mi.get_y() != 0 && !mi.is_moving())
+                                        mi.set_y(mi.get_y() - 1);
                                 }
                             } else {
-                                if(collisions[i].second.left > collisions[j].second.left) {
-                                    if(m_minions[idi].get_x() < m_size)
-                                        m_minions[idi].set_x(m_minions[idi].get_x() + 1);
-                                    if(m_minions[idj].get_x() != 0)
-                                        m_minions[idj].set_x(m_minions[idj].get_x() - 1);
+                                if(mi.get_collision_bounds().left > mj.get_collision_bounds().left) {
+                                    if(mi.get_x() < m_size && !mi.is_moving())
+                                        mi.set_x(mi.get_x() + 1);
+                                    if(mj.get_x() != 0 && !mj.is_moving())
+                                        mj.set_x(mj.get_x() - 1);
                                 } else {
-                                    if(m_minions[idj].get_x() < m_size)
-                                        m_minions[idj].set_x(m_minions[idj].get_x() + 1);
-                                    if(m_minions[idi].get_x() != 0)
-                                        m_minions[idi].set_x(m_minions[idi].get_x() - 1);
+                                    if(mj.get_x() < m_size && !mj.is_moving())
+                                        mj.set_x(mj.get_x() + 1);
+                                    if(mi.get_x() != 0 && !mi.is_moving())
+                                        mi.set_x(mi.get_x() - 1);
                                 }
                             }
                         }

@@ -99,6 +99,11 @@ namespace rts
                 }
             }
 
+            bool Minion::is_moving() const
+            {
+                return m_moving;
+            }
+
             void Minion::set_direction(sf::Uint8 direction)
             {
                 m_direction = direction;

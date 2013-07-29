@@ -42,6 +42,8 @@ namespace rts
                     void select();
                     void deselect();
                     void toggle_selection();
+                    
+                    bool is_moving() const;
 
                     sf::Uint8 get_playerid() const;
 
