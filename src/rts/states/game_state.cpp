@@ -13,6 +13,7 @@ namespace
     const int ticks_per_update = 5;
     const sf::Uint16 num_of_turns_per_minion_respawn = 200;
     const int millis_per_update = 1000 / 50;
+    const sf::Uint32 death_probability = 10000000;
 
     const int start_positions[rts::network::max_players][2] = {
         {0, 0}, {2, 2}, {2, 0}, {0, 2}, {1, 0}, {2, 1}, {1, 2}, {0, 1}
@@ -555,13 +556,13 @@ namespace rts
 
             for(sf::Uint16 i = 0; i < m_minions.size(); ++i) {
                 auto &minion = m_minions[i];
+                if(!minion.alive())
+                    continue;
                 sf::Uint16 x, y;
                 x = minion.get_x() / 128;
                 y = minion.get_y() / 128;
 
-                if(minion.alive()) {
-                    m_minion_tiles[get_id(x, y)].push_back(i);
-                }
+                m_minion_tiles[get_id(x, y)].push_back(i);
 
                 if(minion.get_playerid() == m_my_player) {
                     sf::Uint16 view_distance;
@@ -675,12 +676,12 @@ namespace rts
 
                         auto &mi = m_minions[idi];
                         auto &mj = m_minions[idj];
+                        if(!mi.alive() || !mj.alive()) continue;
+                        sf::Uint16 disth = difference(mi.get_collision_bounds().left, mj.get_collision_bounds().left);
+                        sf::Uint16 distv = difference(mi.get_collision_bounds().top, mj.get_collision_bounds().top);
 
-                        if(mi.get_playerid() == mj.get_playerid()) {
-                            if(collisions[i].second.intersects(collisions[j].second)) {
-                                sf::Uint16 disth = difference(mi.get_collision_bounds().left, mj.get_collision_bounds().left);
-                                sf::Uint16 distv = difference(mi.get_collision_bounds().top, mj.get_collision_bounds().top);
-
+                        if(collisions[i].second.intersects(collisions[j].second)) {
+                            if(mi.get_playerid() == mj.get_playerid()) {
                                 if(distv > disth) {
                                     if(mi.get_collision_bounds().top > mj.get_collision_bounds().top) {
                                         if(mi.get_y() < m_size && !mi.is_moving())
@@ -706,9 +707,15 @@ namespace rts
                                             mi.set_x(mi.get_x() - 1);
                                     }
                                 }
+                            } else {
+                                mi.set_action(game::Minion::Action::FIGHTING);
+                                mj.set_action(game::Minion::Action::FIGHTING);
+
+                                if(m_random() < death_probability)
+                                    kill_minion(idi);
+                                if(m_random() < death_probability)
+                                    kill_minion(idj);
                             }
-                        } else {
-                            // TODO Make them fight
                         }
                     }
                 }
