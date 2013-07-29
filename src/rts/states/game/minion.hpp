@@ -24,7 +24,7 @@ namespace rts
                 public:
                     enum { NO_HAT = 254 };
 
-                    Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader);
+                    Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader, sf::Uint16 map_size);
 
                     void update(int millis, const std::vector<Tile> &tiles);
 

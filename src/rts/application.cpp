@@ -10,7 +10,7 @@ namespace rts
 {
     namespace
     {
-        const sf::Time TIME_PER_FRAME = sf::seconds(1.0 / 30.0);
+        const sf::Time TIME_PER_FRAME = sf::seconds(1.0 / 50.0);
 
         const int MAX_FRAME_SKIPS = 5;
     }

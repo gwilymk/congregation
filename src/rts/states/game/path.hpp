@@ -15,7 +15,7 @@ namespace rts
             class Path
             {
                 public:
-                    Path();
+                    explicit Path(sf::Uint16 map_size);
                     Path(sf::Uint16 startx, sf::Uint16 starty, sf::Uint16 destx, sf::Uint16 desty, const std::vector<Tile> &tiles, sf::Uint16 map_size);
 
                     bool move(sf::Uint16 &x, sf::Uint16 &y, const std::vector<Tile> &tiles, sf::Uint8 &direction);

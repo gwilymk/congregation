@@ -65,12 +65,12 @@ namespace rts
                 network::Server *m_server;
                 network::Channel m_channel;
                 network::ServerInfo m_info;
-                sf::Time m_update_time;
                 bool m_finished_current_turn = false;
                 std::vector<sf::Uint32> m_player_turns;
                 sf::Uint32 m_counter = 0;
 
-                sf::Uint16 m_minion_respawn_timer = 0;
+                bool m_minions_have_spawned = false;
+                int num_ticks = 0;
 
                 CurrentState m_state;
 

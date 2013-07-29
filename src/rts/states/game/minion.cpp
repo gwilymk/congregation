@@ -12,7 +12,7 @@ namespace rts
     {
         namespace game
         {
-            Minion::Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color colour, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader):
+            Minion::Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color colour, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader, sf::Uint16 map_size):
                 m_x(x),
                 m_y(y),
                 m_hatid(hatid),
@@ -26,7 +26,8 @@ namespace rts
                 m_selected(false),
                 m_texture(texture),
                 m_hat_texture(hat_texture),
-                m_shader(shader)
+                m_shader(shader),
+                m_path(map_size)
             {
             }
 
@@ -136,6 +137,8 @@ namespace rts
                 m_shader->setParameter("texture", sf::Shader::CurrentTexture);
                 m_shader->setParameter("minion_colour", m_colour);
                 target.draw(va, states);
+
+                return;
 
                 if(m_hatid == NO_HAT)
                     return;

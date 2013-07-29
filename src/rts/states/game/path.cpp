@@ -22,9 +22,10 @@ namespace rts
                 8, 2, 4,
             };
 
-            Path::Path():
+            Path::Path(sf::Uint16 map_size):
                 m_destx(-1),
                 m_desty(-1),
+                m_map_size(map_size),
                 m_path()
             {
             }
@@ -152,9 +153,6 @@ namespace rts
 
             bool Path::do_move(sf::Uint16 &x, sf::Uint16 &y, sf::Uint8 &direction, sf::Uint16 targetx, sf::Uint16 targety, sf::Uint16 speed)
             {
-                if(targetx > m_map_size * 128 || targety > m_map_size * 128)
-                    return false;
-
                 if(x == targetx && y == targety)
                     return false;
 
@@ -180,6 +178,9 @@ namespace rts
 
             bool Path::move(sf::Uint16 &x, sf::Uint16 &y, const std::vector<Tile> &tiles, sf::Uint8 &direction)
             {
+                if(m_destx > m_map_size * 128 || m_desty > m_map_size * 128)
+                    return false;
+
                 sf::Uint16 speed;
                 {
                     sf::Uint16 tileid = (x / 128) + (y / 128) * m_map_size;
