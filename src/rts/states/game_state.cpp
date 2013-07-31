@@ -24,6 +24,8 @@
 #include <SFGUI/SFGUI.hpp>
 #include <iostream>
 
+#include <cstdlib>
+
 namespace
 {
     const float move_speed = 5.0;
@@ -476,7 +478,7 @@ namespace rts
             }
 
             std::random_device rd;
-            m_tile_random.seed(rd());
+            m_tile_random.seed(std::time(NULL));
             m_next_tile.id = m_tile_dist(m_tile_random);
 
             for(int i = 0; i < m_channel.num_players(); ++i)
