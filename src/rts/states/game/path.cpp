@@ -90,7 +90,7 @@ namespace rts
                 sf::Uint16 ex = endid % map_size;
                 sf::Uint16 ey = (endid - ex) / map_size;
 
-                return ((sx > ex ? sx - ex : ex - sx) + (sy > ey ? sy - ey : ey - sy)) * 2;
+                return ((sx > ex ? sx - ex : ex - sx) + (sy > ey ? sy - ey : ey - sy)) * 4;
             }
 
             static std::vector<std::pair<sf::Uint16, Tile::Orientation>> neighbour_tiles(sf::Uint16 tileid, sf::Uint16 m_size)
