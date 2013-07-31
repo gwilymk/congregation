@@ -40,7 +40,7 @@ namespace rts
             class Minion : public sf::Drawable
             {
                 public:
-                    enum { NO_HAT = 254 };
+                    enum { NUM_HATS = 15, NO_HAT = 254 };
                     enum Action { STANDING, WALKING, FIGHTING };
 
                     Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader, sf::Uint16 map_size);

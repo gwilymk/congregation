@@ -774,9 +774,9 @@ namespace rts
             ASSERT(x > 0 && x < m_size * 128);
             ASSERT(y > 0 && y < m_size * 128);
 
-            std::uniform_int_distribution<sf::Uint8> hat_dist(0, 16);
+            std::uniform_int_distribution<sf::Uint8> hat_dist(0, game::Minion::NUM_HATS - 1 + game::Minion::NUM_HATS);
             sf::Uint8 hatid = hat_dist(m_random);
-            if(hatid >= 9)
+            if(hatid >= game::Minion::NUM_HATS)
                 hatid = game::Minion::NO_HAT;
             game::Minion minion(player_num, hatid, m_player_colours[player_num], x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"), &get_context().shader_holder->get("minion"), m_size);
 
