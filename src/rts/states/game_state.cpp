@@ -28,6 +28,7 @@
 
 namespace
 {
+    const sf::Time respawn_fade_time = sf::seconds(2);
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
     const int ticks_per_update = 5;
@@ -36,7 +37,7 @@ namespace
     const sf::Uint32 death_probability = 10000000;
 
     const int start_positions[rts::network::max_players][2] = {
-        {0, 0}, {2, 2}, {2, 0}, {0, 2}, {1, 0}, {2, 1}, {1, 2}, {0, 1}
+        {0, 0}, {2, 2}, {2, 0}, {0, 2}, {1, 0}, {2, 1}, {2, 2}, {0, 1}
     };
 
     const float s = 0.8, v = 0.8;
@@ -122,7 +123,10 @@ namespace rts
             m_minion_counter_text("0", context.font_holder->get("font")),
             m_minion_counter_shader(&context.shader_holder->get("minion")),
             m_minion_timer_sprite(context.texture_holder->get("clock background")),
-            m_click_notification_sprite(context.texture_holder->get("click notification"), sf::IntRect(0, 0, 32, 32))
+            m_click_notification_sprite(context.texture_holder->get("click notification"), sf::IntRect(0, 0, 32, 32)),
+            m_respawn_plus_sprite(context.texture_holder->get("respawn plus")),
+            m_respawn_text("0", context.font_holder->get("font")),
+            m_respawn_timer(respawn_fade_time)
         {
             m_lobby = new game::Lobby(&m_lobby_done);
             m_lobby->add_to_desktop(*get_context().desktop);
@@ -137,6 +141,11 @@ namespace rts
             m_minion_timer_array.resize(num_of_turns_per_minion_respawn + 1);
             m_minion_timer_array[0].position = sf::Vector2f(80.0, 270.0);
             m_minion_timer_array[0].color = sf::Color(128, 226, 86);
+
+            m_respawn_plus_sprite.setOrigin(16, 16);
+            m_respawn_text.setOrigin(-20, 16);
+            m_respawn_plus_sprite.setPosition(68, 196);
+            m_respawn_text.setPosition(68, 196);
 
             m_minion_timer_sprite.setOrigin(64, 64);
             m_minion_timer_sprite.setPosition(80.0, 270.0);
@@ -215,6 +224,19 @@ namespace rts
             m_next_tile_sprite.setRotation(90 * m_next_tile.orientation);
             m_next_tile_sprite.setTextureRect(sf::IntRect(tu * 128, tv * 128, 128, 128));
             get_context().window->draw(m_next_tile_sprite);
+
+            if(m_respawn_timer < respawn_fade_time) {
+                float factor = m_respawn_timer.asSeconds() / respawn_fade_time.asSeconds();
+                int y = 196 - factor * 32.0;
+                int x = 63;
+
+                m_respawn_plus_sprite.setPosition(x, y);
+                m_respawn_text.setPosition(x, y);
+                m_respawn_plus_sprite.setColor(sf::Color(255, 255, 255, (1.0 - factor) * 255.0));
+                m_respawn_text.setColor(sf::Color(255, 255, 255, (1.0 - factor) * 255.0));
+                get_context().window->draw(m_respawn_plus_sprite);
+                get_context().window->draw(m_respawn_text);
+            }
 
             unsigned int num_verts_for_timer = num_of_turns_per_minion_respawn - (m_commands.get_turn() % num_of_turns_per_minion_respawn);
             get_context().window->draw(m_minion_timer_sprite);
@@ -554,6 +576,8 @@ namespace rts
                 }
             }
 
+            m_respawn_timer += dt;
+
             m_minion_counter_text.setString(number_to_string(m_my_minions.size()));
 
             if(num_ticks >= ticks_per_update && m_finished_current_turn == false) {
@@ -671,6 +695,7 @@ namespace rts
             }
 
             if(m_commands.get_turn() % num_of_turns_per_minion_respawn == 0 && !m_minions_have_spawned) {
+                int num_my_minions_respawned = 0;
                 m_minions_have_spawned = true;
                 
                 std::deque<std::pair<sf::Uint16, sf::Uint8>> spawn_queue;
@@ -722,6 +747,9 @@ namespace rts
                                     if(id != get_id(x, y))
                                         spawn_queue.push_back(std::make_pair(id, minion.get_playerid()));
                                 }
+
+                                if(minion.get_playerid() == m_my_player)
+                                    num_my_minions_respawned += checked_ids.size() - 1;
                             } 
                         }
                         
@@ -734,6 +762,11 @@ namespace rts
                     sf::Uint16 y = pair.first / m_size;
 
                     create_minion(x * 128 + 64, y * 128 + 64, pair.second);
+                }
+
+                if(num_my_minions_respawned) {
+                    m_respawn_text.setString(number_to_string(num_my_minions_respawned));
+                    m_respawn_timer = sf::Time::Zero;
                 }
             }
 

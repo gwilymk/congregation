@@ -133,6 +133,11 @@ namespace rts
                 sf::Sprite m_click_notification_sprite;
                 sf::Time m_click_timer;
                 int m_click_frame = -1;
+
+                sf::Sprite m_respawn_plus_sprite;
+                sf::Text m_respawn_text;
+                sf::Time m_respawn_timer;
+                int m_num_respawn = 0;
         };
     }
 }

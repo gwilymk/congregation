@@ -61,6 +61,7 @@ resource_files = {
     "textures/clock_background.lua"
     "textures/lobby_background.lua"
     "textures/click_notification.lua"
+    "textures/respawn_plus.lua"
 }
 
 for res in *resource_files
