@@ -155,12 +155,10 @@ namespace rts
 
         void GameState::draw()
         {
-            if(m_state == CurrentState::InLobby) {
+            if(m_state != CurrentState::Playing) {
                 get_context().window->draw(m_lobby_background_sprite);
                 return;
             }
-
-            if(m_state != CurrentState::Playing) return;
 
             // draw tiles
             sf::VertexArray array(sf::Quads);
@@ -639,6 +637,8 @@ namespace rts
                 std::deque<std::pair<sf::Uint16, sf::Uint8>> spawn_queue;
 
                 for(auto &minion : m_minions) {
+                    if(!minion.alive())
+                        continue;
                     if(minion.check_city_turn == m_commands.get_turn())
                         continue;
                     sf::Uint16 x = minion.get_x() / 128, y = minion.get_y() / 128;
