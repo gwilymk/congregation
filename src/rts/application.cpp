@@ -17,6 +17,7 @@
 */
 
 #include "application.hpp"
+#include "rts/icon.h"
 #include "rts/states/loading_state.hpp"
 #include "rts/states/title_state.hpp"
 #include "rts/states/game_state.hpp"
@@ -35,7 +36,7 @@ namespace rts
     Application::Application():
         m_sfgui(),
         m_desktop(),
-        m_render_window(sf::VideoMode(800, 600), "rts"),
+        m_render_window(sf::VideoMode(800, 600), "Congregation"),
         m_texture_holder(),
         m_font_holder(),
         m_shader_holder(),
@@ -46,6 +47,7 @@ namespace rts
     {
         m_render_window.setVerticalSyncEnabled(true);
         m_render_window.resetGLStates();
+        m_render_window.setIcon(icon_data.width, icon_data.height, icon_data.pixel_data);
         register_states();
     }
 
