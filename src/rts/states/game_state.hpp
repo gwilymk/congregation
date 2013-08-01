@@ -121,6 +121,8 @@ namespace rts
                 sf::Sprite m_hud_background_sprite;
                 sf::Text m_minion_counter_text;
                 sf::Shader *m_minion_counter_shader;
+                sf::Sprite m_minion_timer_sprite;
+                std::vector<sf::Vertex> m_minion_timer_array;
 
                 sf::View m_view;
 

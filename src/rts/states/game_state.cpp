@@ -31,7 +31,7 @@ namespace
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
     const int ticks_per_update = 5;
-    const sf::Uint16 num_of_turns_per_minion_respawn = 200;
+    const sf::Uint16 num_of_turns_per_minion_respawn = 400;
     const int millis_per_update = 1000 / 50;
     const sf::Uint32 death_probability = 10000000;
 
@@ -119,7 +119,8 @@ namespace rts
             m_tile_placement_box_sprite(context.texture_holder->get("tile placement box")),
             m_hud_background_sprite(context.texture_holder->get("hud background")),
             m_minion_counter_text("0", context.font_holder->get("font")),
-            m_minion_counter_shader(&context.shader_holder->get("minion"))
+            m_minion_counter_shader(&context.shader_holder->get("minion")),
+            m_minion_timer_sprite(context.texture_holder->get("clock background"))
         {
             m_lobby = new game::Lobby(&m_lobby_done);
             m_lobby->add_to_desktop(*get_context().desktop);
@@ -128,9 +129,21 @@ namespace rts
             m_selected_sprite.setOrigin(12, 71);
             m_minion_counter_sprite.setPosition(16, 170);
             m_minion_counter_text.setPosition(86, 180);
-            m_next_tile_sprite.setOrigin(64, 64);
+            m_next_tile_sprite.setOrigin(64, 66);
 
             get_context().texture_holder->get("hud background").setRepeated(true);
+            m_minion_timer_array.resize(num_of_turns_per_minion_respawn + 1);
+            m_minion_timer_array[0].position = sf::Vector2f(80.0, 270.0);
+            m_minion_timer_array[0].color = sf::Color(128, 226, 86);
+
+            m_minion_timer_sprite.setOrigin(64, 64);
+            m_minion_timer_sprite.setPosition(80.0, 270.0);
+
+            for(int i = 1; i < num_of_turns_per_minion_respawn; ++i) {
+                m_minion_timer_array[i].position.x = 80.0 - 34.0 * std::sin((float)i * 2.0 * M_PI / num_of_turns_per_minion_respawn);
+                m_minion_timer_array[i].position.y = 270.0 - 34.0 * std::cos((float)i * 2.0 * M_PI / num_of_turns_per_minion_respawn);
+                m_minion_timer_array[i].color = sf::Color(128, 226, 86, 100);
+            }
         }
 
         GameState::~GameState()
@@ -195,6 +208,10 @@ namespace rts
             m_next_tile_sprite.setRotation(90 * m_next_tile.orientation);
             m_next_tile_sprite.setTextureRect(sf::IntRect(tu * 128, tv * 128, 128, 128));
             get_context().window->draw(m_next_tile_sprite);
+
+            unsigned int num_verts_for_timer = num_of_turns_per_minion_respawn - (m_commands.get_turn() % num_of_turns_per_minion_respawn);
+            get_context().window->draw(m_minion_timer_sprite);
+            get_context().window->draw(m_minion_timer_array.data(), num_verts_for_timer, sf::TrianglesFan);
 
             get_context().window->setView(m_view);
         }

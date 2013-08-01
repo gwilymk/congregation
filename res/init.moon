@@ -58,6 +58,7 @@ resource_files = {
     "textures/tile_placement_box.lua"
     "textures/tiles.lua"
     "textures/title.lua"
+    "textures/clock_background.lua"
 }
 
 for res in *resource_files
