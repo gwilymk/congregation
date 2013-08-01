@@ -110,6 +110,7 @@ namespace rts
             m_server(nullptr),
             m_channel(&m_lobby_done),
             m_player_turns(),
+            m_lobby_background_sprite(context.texture_holder->get("lobby background")),
             m_state(CurrentState::InLobby),
             m_selecting(false),
             m_tile_dist(game::num_grass_tiles, game::Tile::get_total_probability() - 1),
@@ -154,6 +155,11 @@ namespace rts
 
         void GameState::draw()
         {
+            if(m_state == CurrentState::InLobby) {
+                get_context().window->draw(m_lobby_background_sprite);
+                return;
+            }
+
             if(m_state != CurrentState::Playing) return;
 
             // draw tiles

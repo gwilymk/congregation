@@ -26,7 +26,6 @@ namespace rts
         enum class ID { 
             LoadingState,
             TitleState,
-            MainMenuState,
             GameState,
             NumStates, 
         };

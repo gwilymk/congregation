@@ -70,7 +70,7 @@ namespace rts
 
             struct Lobby::Impl
             {
-                sfg::Window::Ptr window;
+                sfg::Box::Ptr window;
                 sfg::Box::Ptr server_list;
 
                 sfg::ComboBox::Ptr num_players;
@@ -121,11 +121,11 @@ namespace rts
             void Lobby::add_to_desktop(sfg::Desktop &desktop)
             {
                 *m_done = false;
-                m_impl->window = sfg::Window::Create();
-                m_impl->window->SetRequisition(sf::Vector2f(300, 300));
-                m_impl->window->SetTitle("Lobby");
+                m_impl->window = sfg::Box::Create(sfg::Box::VERTICAL);
+                m_impl->window->SetPosition(sf::Vector2f(100, 100));
                 sfg::Notebook::Ptr notebook = sfg::Notebook::Create();
-                m_impl->window->Add(notebook);
+                notebook->SetRequisition(sf::Vector2f(300, 300));
+                m_impl->window->Pack(notebook);
                 m_impl->server_list = sfg::Box::Create(sfg::Box::VERTICAL);
                 sfg::ScrolledWindow::Ptr scrolled = sfg::ScrolledWindow::Create();
                 scrolled->AddWithViewport(m_impl->server_list);

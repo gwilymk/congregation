@@ -36,7 +36,7 @@ namespace rts
             float x = (get_context().window->getSize().x - m_text.getLocalBounds().width) / 2.0;
             float y = (get_context().window->getSize().y - m_text.getLocalBounds().height) / 2.0;
             //get_context().music_holder->play("theme");
-            m_text.setPosition(x, y);
+            m_text.setPosition(x, y + 200);
         }
 
         void TitleState::draw()
@@ -58,7 +58,7 @@ namespace rts
                 case sf::Event::MouseButtonPressed:
                 case sf::Event::KeyPressed:
                     request_stack_pop();
-                    request_stack_push(ID::MainMenuState);
+                    request_stack_push(ID::GameState);
                     break;
                 case sf::Event::Closed:
                     request_stack_pop();

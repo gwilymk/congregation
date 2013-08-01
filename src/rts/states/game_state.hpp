@@ -87,6 +87,8 @@ namespace rts
                 std::vector<sf::Uint32> m_player_turns;
                 sf::Uint32 m_counter = 0;
 
+                sf::Sprite m_lobby_background_sprite;
+
                 bool m_minions_have_spawned = false;
                 int num_ticks = 0;
 

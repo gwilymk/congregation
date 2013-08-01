@@ -29,7 +29,6 @@ add_library("${EXECUTABLE_NAME}lib"
     src/rts/states/game_state.cpp
     src/rts/states/game/tile.cpp
     src/rts/states/loading_state.cpp
-    src/rts/states/main_menu.cpp
     src/rts/states/state.cpp
     src/rts/state_stack.cpp
     src/rts/states/title_state.cpp

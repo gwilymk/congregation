@@ -64,6 +64,8 @@ namespace rts
 
                     void set_server(int serverid);
 
+                    void quit();
+
                 private:
                     bool *m_done;
                     std::unique_ptr<Impl> m_impl;
