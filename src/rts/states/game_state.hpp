@@ -127,7 +127,8 @@ namespace rts
                 std::vector<sf::Vertex> m_minion_timer_array;
 
                 sf::View m_view;
-
+                sf::Vector2i m_last_mouse_position;
+                bool m_moving_view = false;
         };
     }
 }

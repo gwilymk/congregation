@@ -270,8 +270,24 @@ namespace rts
                         m_select_end = m_select_start = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));                   
                         m_selecting = true;
                     }
+                } else if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Button::Right) {
+                    m_last_mouse_position = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
                 } else if(event.type == sf::Event::MouseMoved) {
-                    if(m_placing_tile) {
+                    if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+                        sf::Vector2i pos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
+
+                        if(m_moving_view) {
+                            sf::Vector2i delta = pos - m_last_mouse_position;
+                            if(delta.x || delta.y) {
+                                m_view.move(static_cast<sf::Vector2f>(delta));
+                                sf::Mouse::setPosition(m_last_mouse_position, *get_context().window);
+                            }
+                        } else {
+                            sf::Vector2i delta = pos  - m_last_mouse_position;
+                            if(delta.x * delta.x + delta.y * delta.y > 10)
+                                m_moving_view = true;
+                        }
+                    } else if(m_placing_tile) {
                         m_next_tile_sprite.setPosition(event.mouseMove.x, event.mouseMove.y);
                     } else if(m_selecting) {
                         m_select_end = get_context().window->mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y));
@@ -358,7 +374,9 @@ namespace rts
                         }
                     }
                 } else if(event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Button::Right) {
-                    if(m_placing_tile)
+                    if(m_moving_view)
+                        m_moving_view = false;
+                    else if(m_placing_tile)
                         m_placing_tile = false;
                     else if(event.mouseButton.x > 160) {
                         game::Command command;
@@ -380,9 +398,9 @@ namespace rts
                     }
                 } else if(event.type == sf::Event::KeyPressed) {
                     if(m_placing_tile) {
-                        if(event.key.code == sf::Keyboard::Q) {
+                        if(event.key.code == sf::Keyboard::Q || event.key.code == sf::Keyboard::Quote || event.key.code == sf::Keyboard::Unknown) {
                             m_next_tile.orientation = (game::Tile::Orientation) ((m_next_tile.orientation + 3) % 4);
-                        } else if(event.key.code == sf::Keyboard::E) {
+                        } else if(event.key.code == sf::Keyboard::E || event.key.code == sf::Keyboard::Period) {
                             m_next_tile.orientation = (game::Tile::Orientation) ((m_next_tile.orientation + 1) % 4);
                         }
                     }
