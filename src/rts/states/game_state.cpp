@@ -141,8 +141,8 @@ namespace rts
             m_minion_timer_sprite.setPosition(80.0, 270.0);
 
             for(int i = 1; i < num_of_turns_per_minion_respawn; ++i) {
-                m_minion_timer_array[i].position.x = 80.0 - 34.0 * std::sin((float)i * 2.0 * M_PI / num_of_turns_per_minion_respawn);
-                m_minion_timer_array[i].position.y = 270.0 - 34.0 * std::cos((float)i * 2.0 * M_PI / num_of_turns_per_minion_respawn);
+                m_minion_timer_array[i].position.x = 80.0 - 34.0 * std::sin((float)i * 2.0 * 3.1415926535 / num_of_turns_per_minion_respawn);
+                m_minion_timer_array[i].position.y = 270.0 - 34.0 * std::cos((float)i * 2.0 * 3.1415926535 / num_of_turns_per_minion_respawn);
                 m_minion_timer_array[i].color = sf::Color(128, 226, 86, 100);
             }
         }
