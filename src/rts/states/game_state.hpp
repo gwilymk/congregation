@@ -129,6 +129,10 @@ namespace rts
                 sf::View m_view;
                 sf::Vector2i m_last_mouse_position;
                 bool m_moving_view = false;
+
+                sf::Sprite m_click_notification_sprite;
+                sf::Time m_click_timer;
+                int m_click_frame = -1;
         };
     }
 }

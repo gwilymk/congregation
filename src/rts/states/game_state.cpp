@@ -121,7 +121,8 @@ namespace rts
             m_hud_background_sprite(context.texture_holder->get("hud background")),
             m_minion_counter_text("0", context.font_holder->get("font")),
             m_minion_counter_shader(&context.shader_holder->get("minion")),
-            m_minion_timer_sprite(context.texture_holder->get("clock background"))
+            m_minion_timer_sprite(context.texture_holder->get("clock background")),
+            m_click_notification_sprite(context.texture_holder->get("click notification"), sf::IntRect(0, 0, 32, 32))
         {
             m_lobby = new game::Lobby(&m_lobby_done);
             m_lobby->add_to_desktop(*get_context().desktop);
@@ -139,6 +140,8 @@ namespace rts
 
             m_minion_timer_sprite.setOrigin(64, 64);
             m_minion_timer_sprite.setPosition(80.0, 270.0);
+
+            m_click_notification_sprite.setOrigin(16, 16);
 
             for(int i = 1; i < num_of_turns_per_minion_respawn; ++i) {
                 m_minion_timer_array[i].position.x = 80.0 - 34.0 * std::sin((float)i * 2.0 * 3.1415926535 / num_of_turns_per_minion_respawn);
@@ -216,6 +219,11 @@ namespace rts
             unsigned int num_verts_for_timer = num_of_turns_per_minion_respawn - (m_commands.get_turn() % num_of_turns_per_minion_respawn);
             get_context().window->draw(m_minion_timer_sprite);
             get_context().window->draw(m_minion_timer_array.data(), num_verts_for_timer, sf::TrianglesFan);
+
+            if(m_click_frame != -1) {
+                m_click_notification_sprite.setTextureRect(sf::IntRect(m_click_frame * 32, 0, 32, 32));
+                get_context().window->draw(m_click_notification_sprite);
+            }
 
             get_context().window->setView(m_view);
         }
@@ -395,6 +403,9 @@ namespace rts
                                 send_command(command);
                             }
                         }
+
+                        m_click_notification_sprite.setPosition(event.mouseButton.x, event.mouseButton.y);
+                        m_click_frame = 0;
                     }
                 } else if(event.type == sf::Event::KeyPressed) {
                     if(m_placing_tile) {
@@ -532,6 +543,16 @@ namespace rts
         {
             sf::Packet packet;
             sf::Uint8 playerid;
+
+            if(m_click_frame != -1) {
+                m_click_timer += dt;
+                if(m_click_timer > sf::seconds(1 / 30.0f)) {
+                    m_click_timer -= sf::seconds(1 / 30.0f);
+                    ++m_click_frame;
+                    if(m_click_frame >= 5)
+                        m_click_frame = -1;
+                }
+            }
 
             m_minion_counter_text.setString(number_to_string(m_my_minions.size()));
 
