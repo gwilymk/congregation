@@ -66,7 +66,7 @@ namespace
         {GRASS, GRASS, GRASS, GRASS},
     };
 
-    sf::Uint8 connections[num_tiles][3] = {
+    const sf::Uint8 connections[num_tiles][3] = {
         {1, 2, 3},
         {1, 2, 3},
         {1, 2, 3},
