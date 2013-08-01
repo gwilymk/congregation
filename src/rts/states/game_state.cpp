@@ -130,7 +130,7 @@ namespace rts
             m_selected_sprite.setOrigin(12, 71);
             m_minion_counter_sprite.setPosition(16, 170);
             m_minion_counter_text.setPosition(86, 180);
-            m_next_tile_sprite.setOrigin(64, 66);
+            m_next_tile_sprite.setOrigin(64, 64);
 
             get_context().texture_holder->get("hud background").setRepeated(true);
             m_minion_timer_array.resize(num_of_turns_per_minion_respawn + 1);
