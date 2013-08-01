@@ -26,7 +26,9 @@ namespace rts
     {
         void __debug_break_here()
         {
-            while(true);
+#ifndef NDEBUG
+            while(true); // so that the program doesn't stop running
+#endif
         }
 
         void fail(const char *code, const char *file, int line)
