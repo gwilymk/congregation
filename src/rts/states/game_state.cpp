@@ -112,7 +112,7 @@ namespace rts
             m_player_turns(),
             m_state(CurrentState::InLobby),
             m_selecting(false),
-            m_tile_dist(game::num_grass_tiles, game::num_tiles - 1),
+            m_tile_dist(game::num_grass_tiles, game::Tile::get_total_probability() - 1),
             m_next_tile_sprite(context.texture_holder->get("tiles")),
             m_selected_sprite(context.texture_holder->get("select_arrow")),
             m_minion_counter_sprite(context.texture_holder->get("minion counter")),
@@ -348,7 +348,7 @@ namespace rts
                             if(m_visibility[position_id] == 2 && m_tiles[position_id].id < game::num_grass_tiles && legal_move(m_next_tile, command.place_piece.x, command.place_piece.y)) {
                                 send_command(command);
                                 m_placing_tile = false;
-                                m_next_tile.id = m_tile_dist(m_tile_random);
+                                m_next_tile.id = game::Tile::get_tile(m_tile_dist(m_tile_random));
                                 m_next_tile.orientation = game::Tile::Orientation::NORTH;
                             }
                         }
@@ -496,7 +496,7 @@ namespace rts
 
             std::random_device rd;
             m_tile_random.seed(std::time(NULL));
-            m_next_tile.id = m_tile_dist(m_tile_random);
+            m_next_tile.id = game::Tile::get_tile(m_tile_dist(m_tile_random));
 
             for(int i = 0; i < m_channel.num_players(); ++i)
                 m_player_turns.push_back(0);

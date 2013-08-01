@@ -103,6 +103,41 @@ namespace
         {1, 3, 2},
         {1, 2, 3},
     };
+
+    const sf::Uint32 probability[num_tiles] = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        4,
+        1,
+        2,
+        2,
+        1,
+        1,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        2,
+        1,
+        2,
+        2,
+    };
 }
 
 namespace rts
@@ -138,7 +173,7 @@ namespace rts
                 sf::Uint8 abs_orientation = (direction + 4 - orientation) % 4;
                 std::set<sf::Uint8> tmp;
                 std::vector<Orientation> ret;
-                sf::Uint8 *c = connections[id];
+                const sf::Uint8 *c = connections[id];
                 sf::Uint8 current = abs_orientation;
                 tmp.insert(current);
                 while(current < 3 && c[current] != current) {
@@ -203,6 +238,30 @@ namespace rts
             {
                 packet >> tile.id;
                 return packet >> (sf::Uint8 &) tile.orientation;
+            }
+
+            sf::Uint16 Tile::get_total_probability()
+            {
+                sf::Uint16 ret = 0;
+
+                for(int i = 0; i < num_tiles; ++i) {
+                    ret += probability[i];
+                }
+
+                return ret;
+            }
+
+            sf::Uint8 Tile::get_tile(sf::Uint16 prob)
+            {
+                sf::Uint16 cummulative = 0;
+
+                for(sf::Uint8 id = 0; id < num_tiles; ++id) {
+                    cummulative += probability[id];
+                    if(cummulative > prob)
+                        return id;
+                }
+
+                return 0;
             }
         }
     }

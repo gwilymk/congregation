@@ -50,6 +50,9 @@ namespace rts
                 Orientation get_direction(sf::Uint16 x, sf::Uint16 y) const;
 
                 std::vector<Orientation> connected_to(Orientation direction);
+
+                static sf::Uint16 get_total_probability();
+                static sf::Uint8 get_tile(sf::Uint16 prob);
             };
 
             sf::Packet &operator<<(sf::Packet &packet, const Tile &tile);
