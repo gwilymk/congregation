@@ -20,6 +20,7 @@
 #include "rts/states/game/lobby.hpp"
 #include "rts/network/server.hpp"
 #include "rts/states/game/command.hpp"
+#include "rts/tips.hpp"
 
 #include <SFGUI/SFGUI.hpp>
 #include <iostream>
@@ -462,15 +463,19 @@ namespace rts
 
                 m_state = CurrentState::Waiting;
 
+                sfg::Box::Ptr vbox = sfg::Box::Create(sfg::Box::VERTICAL);
                 m_status_label = sfg::Label::Create("Waiting for other players (m/m)");
                 sfg::Spinner::Ptr s = sfg::Spinner::Create();
                 s->Start();
                 sfg::Box::Ptr hbox = sfg::Box::Create(sfg::Box::HORIZONTAL);
                 hbox->Pack(s);
-                hbox->Pack(m_status_label);
+                vbox->Pack(m_status_label);
+                vbox->Pack(sfg::Label::Create(tips[std::time(NULL) % num_tips]));
+                hbox->Pack(vbox);
                 sfg::Window::Ptr w = sfg::Window::Create();
                 w->SetTitle("Waiting...");
                 w->Add(hbox);
+                w->SetPosition(sf::Vector2f(100, 100));
                 get_context().desktop->Add(w);
             }
         }
