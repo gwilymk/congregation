@@ -327,7 +327,7 @@ namespace rts
                             }
                         } else {
                             sf::Vector2i delta = pos  - m_last_mouse_position;
-                            if(delta.x * delta.x + delta.y * delta.y > 20)
+                            if(delta.x * delta.x + delta.y * delta.y > 20 * 20)
                                 m_moving_view = true;
                         }
                     } else if(m_placing_tile) {
