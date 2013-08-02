@@ -840,7 +840,7 @@ namespace rts
                                         if(mj.get_x() != 0 && !mj.is_moving())
                                             mj.set_x(mj.get_x() - 1);
                                     } else {
-                                        if(mj.get_x() < m_size * 128 - 1&& !mj.is_moving())
+                                        if(mj.get_x() < m_size * 128 - 1 && !mj.is_moving())
                                             mj.set_x(mj.get_x() + 1);
                                         if(mi.get_x() != 0 && !mi.is_moving())
                                             mi.set_x(mi.get_x() - 1);
