@@ -863,8 +863,8 @@ namespace rts
             sf::Vector2f size = m_view.getSize();
             sf::Vector2f center = m_view.getCenter();
 
-            if(center.x - size.x / 2.0 + 160 < 0)
-                center.x = size.x / 2.0 - 160;
+            if(center.x - size.x / 2.0 + 160.0 * size.x / get_context().window->getSize().x < 0)
+                center.x = size.x / 2.0 - 160.0 * size.x / get_context().window->getSize().x;
             if(center.y - size.y / 2.0 < 0)
                 center.y = size.y / 2.0;
             if(center.x + size.x / 2.0 > m_size * 128)
