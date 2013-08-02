@@ -823,24 +823,24 @@ namespace rts
 
                                 if(direction) {
                                     if(mi.get_collision_bounds().top > mj.get_collision_bounds().top) {
-                                        if(mi.get_y() < m_size * 128 && !mi.is_moving())
+                                        if(mi.get_y() < m_size * 128 - 1 && !mi.is_moving())
                                             mi.set_y(mi.get_y() + 1);
                                         if(mj.get_y() != 0 && !mj.is_moving())
                                             mj.set_y(mj.get_y() - 1);
                                     } else {
-                                        if(mj.get_y() < m_size * 128 && !mj.is_moving())
+                                        if(mj.get_y() < m_size * 128 - 1 && !mj.is_moving())
                                             mj.set_y(mj.get_y() + 1);
                                         if(mi.get_y() != 0 && !mi.is_moving())
                                             mi.set_y(mi.get_y() - 1);
                                     }
                                 } else {
                                     if(mi.get_collision_bounds().left > mj.get_collision_bounds().left) {
-                                        if(mi.get_x() < m_size * 128 && !mi.is_moving())
+                                        if(mi.get_x() < m_size * 128 - 1 && !mi.is_moving())
                                             mi.set_x(mi.get_x() + 1);
                                         if(mj.get_x() != 0 && !mj.is_moving())
                                             mj.set_x(mj.get_x() - 1);
                                     } else {
-                                        if(mj.get_x() < m_size * 128 && !mj.is_moving())
+                                        if(mj.get_x() < m_size * 128 - 1&& !mj.is_moving())
                                             mj.set_x(mj.get_x() + 1);
                                         if(mi.get_x() != 0 && !mi.is_moving())
                                             mi.set_x(mi.get_x() - 1);
