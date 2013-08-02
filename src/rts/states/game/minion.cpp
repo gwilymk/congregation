@@ -30,7 +30,7 @@ namespace rts
     {
         namespace game
         {
-            Minion::Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color colour, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader, sf::Uint16 map_size):
+            Minion::Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color colour, sf::Uint16 x, sf::Uint16 y, sf::Uint16 map_size):
                 m_x(x),
                 m_y(y),
                 m_action(Action::STANDING),
@@ -42,9 +42,6 @@ namespace rts
                 m_playerid(playerid),
                 m_alive(true),
                 m_selected(false),
-                m_texture(texture),
-                m_hat_texture(hat_texture),
-                m_shader(shader),
                 m_path(map_size)
             {
             }
@@ -158,9 +155,9 @@ namespace rts
                 m_path = Path(m_x, m_y, x, y, tiles, map_size);
             }
 
-            void Minion::draw(sf::RenderTarget &target, sf::RenderStates states) const
+            void Minion::draw(sf::VertexArray &minion_array, sf::VertexArray &hat_array) const
             {
-                sf::VertexArray va(sf::Quads, 4);
+                sf::Vertex va[4];
 
                 va[0].position = sf::Vector2f(m_x - 16, m_y - 39);
                 va[1].position = sf::Vector2f(m_x + 15, m_y - 39);
@@ -173,11 +170,10 @@ namespace rts
                 va[2].texCoords = sf::Vector2f((m_frame + 1) * 32, (m_direction + 1 + action) * 48);
                 va[3].texCoords = sf::Vector2f(m_frame * 32, (m_direction + 1 + action) * 48);
 
-                states.texture = m_texture;
-                states.shader = m_shader;
-                m_shader->setParameter("texture", sf::Shader::CurrentTexture);
-                m_shader->setParameter("minion_colour", m_colour);
-                target.draw(va, states);
+                for(int i = 0; i < 4; ++i) {
+                    va[i].color = m_colour;
+                    minion_array.append(va[i]);
+                }
 
                 if(m_hatid == NO_HAT)
                     return;
@@ -189,10 +185,12 @@ namespace rts
                 
                 if(m_direction % 2 == 1 && m_action == Action::WALKING && (m_frame == 2 || m_frame == 6))
                     for(int i = 0; i < 4; ++i)
-                        va[i].texCoords -= sf::Vector2f(0, 1);
+                        va[i].position -= sf::Vector2f(0, 1);
 
-                states.texture = m_hat_texture;
-                target.draw(va, states);
+                for(int i = 0; i < 4; ++i) {
+                    va[i].color = sf::Color::White;
+                    hat_array.append(va[i]);
+                }
             }
         }
     }

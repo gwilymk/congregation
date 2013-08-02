@@ -180,6 +180,8 @@ namespace rts
             }
 
             get_context().window->draw(array, &get_context().texture_holder->get("tiles"));
+            sf::VertexArray minion_array(sf::Quads);
+            sf::VertexArray hat_array(sf::Quads);
 
             for(auto &tile : m_minion_tiles) {
                 if(tile.empty()) continue;
@@ -187,12 +189,22 @@ namespace rts
                     auto &minion = m_minions[minion_id];
                     if(minion.alive()) {
                         if(m_visibility.at(minion.get_x() / 128 + (minion.get_y() / 128) * m_size) == 2)
-                            get_context().window->draw(minion);
-                        if(minion.selected()) {
-                            m_selected_sprite.setPosition(minion.get_x(), minion.get_y());
-                            get_context().window->draw(m_selected_sprite);
-                        }
+                            minion.draw(minion_array, hat_array);
                     }
+                }
+            }
+
+            sf::RenderStates states;
+            states.texture = &get_context().texture_holder->get("minion");
+            states.shader = m_minion_counter_shader;
+            get_context().window->draw(minion_array, states);
+            get_context().window->draw(hat_array, &get_context().texture_holder->get("hats"));
+
+            for(sf::Uint16 mid : m_my_minions) {
+                auto minion = m_minions[mid];
+                if(minion.selected()) {
+                    m_selected_sprite.setPosition(minion.get_x(), minion.get_y());
+                    get_context().window->draw(m_selected_sprite);
                 }
             }
 
@@ -214,7 +226,7 @@ namespace rts
             m_hud_background_sprite.setTextureRect(view_recti);
             get_context().window->draw(m_hud_background_sprite);
             get_context().window->draw(m_tile_placement_box_sprite);
-            m_minion_counter_shader->setParameter("minion_colour", m_player_colours[m_my_player]);
+            m_minion_counter_sprite.setColor(m_player_colours[m_my_player]);
             get_context().window->draw(m_minion_counter_sprite, m_minion_counter_shader);
             get_context().window->draw(m_minion_counter_text);
 
@@ -880,7 +892,7 @@ namespace rts
             sf::Uint8 hatid = hat_dist(m_random);
             if(hatid >= game::Minion::NUM_HATS)
                 hatid = game::Minion::NO_HAT;
-            game::Minion minion(player_num, hatid, m_player_colours[player_num], x, y, &get_context().texture_holder->get("minion"), &get_context().texture_holder->get("hats"), &get_context().shader_holder->get("minion"), m_size);
+            game::Minion minion(player_num, hatid, m_player_colours[player_num], x, y, m_size);
 
             sf::Uint16 minionid;
 

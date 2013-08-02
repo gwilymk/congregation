@@ -16,8 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+varying vec4 colour;
+
 void main()
 {
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
     gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+    colour = gl_Color;
 }

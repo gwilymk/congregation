@@ -21,7 +21,6 @@
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/Time.hpp>
-#include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -37,13 +36,13 @@ namespace rts
     {
         namespace game
         {
-            class Minion : public sf::Drawable
+            class Minion
             {
                 public:
                     enum { NUM_HATS = 23, NO_HAT = 254 };
                     enum Action { STANDING, WALKING, FIGHTING };
 
-                    Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Texture *texture, sf::Texture *hat_texture, sf::Shader *shader, sf::Uint16 map_size);
+                    Minion(sf::Uint8 playerid, sf::Uint8 hatid, sf::Color color, sf::Uint16 x, sf::Uint16 y, sf::Uint16 map_size);
 
                     void update(int millis, const std::vector<Tile> &tiles);
 
@@ -71,12 +70,10 @@ namespace rts
 
                     sf::FloatRect get_bounds() const;
                     sf::IntRect get_collision_bounds() const;
+                    void draw(sf::VertexArray &minion_array, sf::VertexArray &hat_array) const;
 
                 public:
                     sf::Uint32 check_city_turn = -1;
-
-                private:
-                    void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
                 private:
                     sf::Uint16 m_x;
@@ -94,10 +91,6 @@ namespace rts
 
                     bool m_alive;
                     bool m_selected;
-
-                    sf::Texture *m_texture;
-                    sf::Texture *m_hat_texture;
-                    sf::Shader *m_shader;
 
                     Path m_path;
             };
