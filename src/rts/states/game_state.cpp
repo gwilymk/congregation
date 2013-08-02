@@ -802,8 +802,7 @@ namespace rts
                 }
                 sf::Uint16 size = collisions.size();
                 for(sf::Uint16 i = 0; i < size; ++i) {
-                    for(sf::Uint16 j = 0; j < size; ++j) {
-                        if(i == j) continue;
+                    for(sf::Uint16 j = i + 1; j < size; ++j) {
                         sf::Uint16 idi = collisions[i].first, idj = collisions[j].first;
 
                         auto &mi = m_minions[idi];
@@ -814,26 +813,34 @@ namespace rts
 
                         if(collisions[i].second.intersects(collisions[j].second)) {
                             if(mi.get_playerid() == mj.get_playerid()) {
-                                if(distv > disth) {
+                                bool direction; // vertical = true, horizontal = false
+                                if(distv > disth)
+                                    direction = true;
+                                else if(distv < disth)
+                                    direction = false;
+                                else 
+                                    direction = m_random() > m_random.max() / 2;
+
+                                if(direction) {
                                     if(mi.get_collision_bounds().top > mj.get_collision_bounds().top) {
-                                        if(mi.get_y() < m_size && !mi.is_moving())
+                                        if(mi.get_y() < m_size * 128 && !mi.is_moving())
                                             mi.set_y(mi.get_y() + 1);
                                         if(mj.get_y() != 0 && !mj.is_moving())
                                             mj.set_y(mj.get_y() - 1);
                                     } else {
-                                        if(mj.get_y() < m_size && !mj.is_moving())
+                                        if(mj.get_y() < m_size * 128 && !mj.is_moving())
                                             mj.set_y(mj.get_y() + 1);
                                         if(mi.get_y() != 0 && !mi.is_moving())
                                             mi.set_y(mi.get_y() - 1);
                                     }
                                 } else {
                                     if(mi.get_collision_bounds().left > mj.get_collision_bounds().left) {
-                                        if(mi.get_x() < m_size && !mi.is_moving())
+                                        if(mi.get_x() < m_size * 128 && !mi.is_moving())
                                             mi.set_x(mi.get_x() + 1);
                                         if(mj.get_x() != 0 && !mj.is_moving())
                                             mj.set_x(mj.get_x() - 1);
                                     } else {
-                                        if(mj.get_x() < m_size && !mj.is_moving())
+                                        if(mj.get_x() < m_size * 128 && !mj.is_moving())
                                             mj.set_x(mj.get_x() + 1);
                                         if(mi.get_x() != 0 && !mi.is_moving())
                                             mi.set_x(mi.get_x() - 1);
