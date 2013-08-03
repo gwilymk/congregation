@@ -28,12 +28,12 @@ namespace rts
     {
         namespace game
         {
-            const sf::Uint16 grass_speed = 1;
+            /*const sf::Uint16 grass_speed = 1;
             const sf::Uint16 road_speed = 4;
-            const sf::Uint16 city_speed = 2;
+            const sf::Uint16 city_speed = 2;*/
 
             const sf::Uint16 speeds[3] = {
-                1, 4, 2
+                10, 40, 20
             };
 
             const sf::Uint16 costs[3] = {

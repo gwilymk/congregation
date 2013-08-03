@@ -25,6 +25,8 @@
 #include <SFGUI/SFGUI.hpp>
 #include <iostream>
 
+#include <SFML/Audio/Listener.hpp>
+
 #include <cstdlib>
 
 namespace
@@ -33,7 +35,7 @@ namespace
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
     const int ticks_per_update = 5;
-    const sf::Uint16 num_of_turns_per_minion_respawn = 400;
+    const sf::Uint16 num_of_turns_per_minion_respawn = 40;
     const int millis_per_update = 1000 / 50;
     const sf::Uint32 death_probability = 10000000;
 
@@ -152,6 +154,8 @@ namespace rts
             m_minion_timer_sprite.setPosition(80.0, 270.0);
 
             m_click_notification_sprite.setOrigin(16, 16);
+
+            sf::Listener::setDirection(0, 0, -1);
 
             for(int i = 1; i < num_of_turns_per_minion_respawn; ++i) {
                 m_minion_timer_array[i].position.x = 80.0 - 34.0 * std::sin((float)i * 2.0 * 3.1415926535 / num_of_turns_per_minion_respawn);
@@ -850,15 +854,23 @@ namespace rts
                                 mi.set_action(game::Minion::Action::FIGHTING);
                                 mj.set_action(game::Minion::Action::FIGHTING);
 
-                                if(m_random() < death_probability)
+                                sf::Uint32 random = m_random();
+
+                                if(random < death_probability)
                                     kill_minion(idi);
-                                if(m_random() < death_probability)
+                                else if(random < death_probability * 2)
                                     kill_minion(idj);
+                                else if(random < death_probability * 12 && m_time_since_last_play_sound >= 10) {
+                                    play_sound((mi.get_x() + mj.get_x()) / 2, (mi.get_y() + mj.get_y()) / 2, "punch" + number_to_string(random % 6 + 1));
+                                    m_time_since_last_play_sound = 0;
+                                }
                             }
                         }
                     }
                 }
             }
+
+            ++m_time_since_last_play_sound;
 
             sf::Vector2f size = m_view.getSize();
             sf::Vector2f center = m_view.getCenter();
@@ -874,6 +886,8 @@ namespace rts
 
             m_view.setCenter(center);
             get_context().window->setView(m_view);
+
+            sf::Listener::setPosition(center.x, center.y, 256);
         }
 
         void GameState::update_input(sf::Time dt)
@@ -1072,6 +1086,26 @@ namespace rts
                         m_visibility[get_id(i, j)] = std::max(m_visibility[get_id(i, j)], (sf::Uint8)1);
                 }
             }
+        }
+
+        void GameState::play_sound(int x, int y, const std::string &name)
+        {
+            sf::Sound *sound = new sf::Sound;
+            sound->setBuffer(get_context().sound_holder->get(name));
+            sound->setAttenuation(1.1);
+            sound->setMinDistance(128.0);
+
+            sound->setPosition(x, y, 0);
+            sound->play();
+
+            for(unsigned int i = 0; i < m_sounds.size(); ++i) {
+                if(m_sounds[i]->getStatus() == sf::Sound::Stopped) {
+                    m_sounds[i].reset(sound);
+                    return;
+                }
+            }
+
+            m_sounds.emplace_back(sound);
         }
     }
 }

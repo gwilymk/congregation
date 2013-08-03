@@ -74,6 +74,7 @@ namespace rts
 
                 public:
                     sf::Uint32 check_city_turn = -1;
+                    sf::Uint16 punch_time = 0;
 
                 private:
                     sf::Uint16 m_x;

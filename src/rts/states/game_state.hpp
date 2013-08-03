@@ -27,6 +27,7 @@
 #include "rts/network/server_info.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Audio/Sound.hpp>
 #include <SFGUI/Label.hpp>
 #include <vector>
 #include <random>
@@ -74,6 +75,8 @@ namespace rts
                 sf::Uint16 get_id(sf::Uint16 x, sf::Uint16 y) const;
 
                 void light_up(sf::Uint16 x, sf::Uint16 y, sf::Uint16 view_dist, sf::Uint16 fade_dist);
+
+                void play_sound(int x, int y, const std::string &name);
 
             private:
                 bool m_lobby_done;
@@ -138,6 +141,9 @@ namespace rts
                 sf::Text m_respawn_text;
                 sf::Time m_respawn_timer;
                 int m_num_respawn = 0;
+
+                std::vector<std::unique_ptr<sf::Sound>> m_sounds;
+                int m_time_since_last_play_sound = 10000;
         };
     }
 }
