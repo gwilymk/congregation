@@ -48,6 +48,12 @@ load_resource = (filename) ->
 
 resource_files = {
     "fonts/font.lua"
+    "music/caketown.lua"
+    "music/irradiated_dreams.lua"
+    "music/milestones.lua"
+    "music/respawn.lua"
+    "music/soliloquy.lua"
+    "music/southern_pastures.lua"
     "music/theme_music.lua"
     "shaders/minion.lua"
     "textures/hats.lua"

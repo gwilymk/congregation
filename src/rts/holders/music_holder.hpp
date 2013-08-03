@@ -36,6 +36,7 @@ namespace rts
 
                 void play(const std::string &name, bool loop = true);
                 void stop();
+                bool is_playing();
             
             private:
                 sf::Music m_current_music;

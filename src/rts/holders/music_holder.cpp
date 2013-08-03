@@ -39,5 +39,10 @@ namespace rts
         {
             m_current_music.stop();
         }
+
+        bool MusicHolder::is_playing() 
+        {
+            return m_current_music.getStatus() == sf::Music::Playing;
+        }
     }
 }

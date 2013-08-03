@@ -21,6 +21,7 @@
 #include "rts/network/server.hpp"
 #include "rts/states/game/command.hpp"
 #include "rts/tips.hpp"
+#include "rts/holders/music_holder.hpp"
 
 #include <SFGUI/SFGUI.hpp>
 #include <iostream>
@@ -582,6 +583,8 @@ namespace rts
 
             m_visibility.resize(m_size * m_size);
             m_minion_tiles.resize(m_size * m_size);
+
+            get_context().music_holder->play("calm1", false);
         }
 
         void GameState::playing_update(sf::Time dt)
@@ -802,6 +805,8 @@ namespace rts
                     minion.update(millis_per_update, m_tiles);
             }
 
+            int num_fighting = 0;
+
             for(auto &minion_list : m_minion_tiles) {
                 std::vector<std::pair<sf::Uint16, sf::IntRect>> collisions;
                 for(sf::Uint16 minion : minion_list) {
@@ -859,6 +864,8 @@ namespace rts
 
                                 sf::Uint32 random = m_random();
 
+                                ++num_fighting;
+
                                 if(random < death_probability)
                                     kill_minion(idi);
                                 else if(random < death_probability * 2)
@@ -870,6 +877,16 @@ namespace rts
                             }
                         }
                     }
+                }
+            }
+
+            if(!get_context().music_holder->is_playing()) {
+                if(num_fighting == 0) {
+                    get_context().music_holder->play("calm" + number_to_string(m_tile_random() % 3 + 1), false);
+                } else if((float)num_fighting / (float)m_num_alive_minions < 0.5) {
+                    get_context().music_holder->play("tense" + number_to_string(m_tile_random() % 2 + 1), false);
+                } else {
+                    get_context().music_holder->play("war", false);
                 }
             }
 
@@ -933,10 +950,13 @@ namespace rts
 
             if(player_num == m_my_player)
                 m_my_minions.push_back(minionid);
+
+            ++m_num_alive_minions;
         }
 
         void GameState::kill_minion(sf::Uint16 id)
         {
+            --m_num_alive_minions;
             if(m_minions[id].get_playerid() == m_my_player) {
                 m_my_minions.erase(std::find(m_my_minions.begin(), m_my_minions.end(), id));
             }
