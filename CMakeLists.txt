@@ -13,7 +13,7 @@ endif()
 
 set(SFML_STATIC_LIBRARIES FALSE CACHE BOOL "Use static SFML librares")
 
-set(EXECUTABLE_NAME "rts")
+set(EXECUTABLE_NAME "congregation")
 
 add_library("${EXECUTABLE_NAME}lib"
     src/rts/application.cpp
