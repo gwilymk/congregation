@@ -35,7 +35,7 @@ namespace
     const float move_speed = 5.0;
     const float zoom_speed = 1.2;
     const int ticks_per_update = 5;
-    const sf::Uint16 num_of_turns_per_minion_respawn = 40;
+    const sf::Uint16 num_of_turns_per_minion_respawn = 400;
     const int millis_per_update = 1000 / 50;
     const sf::Uint32 death_probability = 10000000;
 
@@ -417,6 +417,8 @@ namespace rts
                                 m_placing_tile = false;
                                 m_next_tile.id = game::Tile::get_tile(m_tile_dist(m_tile_random));
                                 m_next_tile.orientation = game::Tile::Orientation::NORTH;
+                            } else {
+                                play_sound(target.x, target.y, "not valid place");
                             }
                         }
                     }
@@ -662,6 +664,7 @@ namespace rts
                             break;
                         case game::Command::COMMAND::PlacePiece:
                             m_tiles[command.place_piece.x + command.place_piece.y * m_size] = command.place_piece.tile;
+                            play_sound(command.place_piece.x * 128, command.place_piece.y * 128, "thud");
                             break;
                         case game::Command::COMMAND::Invalid:
                             done = true;
