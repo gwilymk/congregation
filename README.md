@@ -50,7 +50,7 @@ All graphics copyright &copy; Jake Cawthray (jakecawthray@gmail.com) and Thomas 
 
 The font is released under the open font licence.
 
-The title music (which doesn't play yet) is by Matthew Pablo (www.matthewpablo.com) and released
+All the music played is by Matthew Pablo (www.matthewpablo.com) and released
 under creative commons by attribution.
 
 Please see the relevant directories or websites for more information.
