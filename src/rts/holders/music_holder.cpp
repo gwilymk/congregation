@@ -40,9 +40,19 @@ namespace rts
             m_current_music.stop();
         }
 
-        bool MusicHolder::is_playing() 
+        bool MusicHolder::is_playing() const
         {
             return m_current_music.getStatus() == sf::Music::Playing;
+        }
+
+        float MusicHolder::get_volume() const
+        {
+            return m_current_music.getVolume();
+        }
+
+        void MusicHolder::set_volume(float new_volume)
+        {
+            m_current_music.setVolume(new_volume);
         }
     }
 }

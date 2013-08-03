@@ -22,6 +22,7 @@
 #include "rts/states/game/command.hpp"
 #include "rts/tips.hpp"
 #include "rts/holders/music_holder.hpp"
+#include "rts/settings.hpp"
 
 #include <SFGUI/SFGUI.hpp>
 #include <iostream>
@@ -132,7 +133,7 @@ namespace rts
             m_respawn_text("0", context.font_holder->get("font")),
             m_respawn_timer(respawn_fade_time)
         {
-            m_lobby = new game::Lobby(&m_lobby_done);
+            m_lobby = new game::Lobby(&m_lobby_done, get_context());
             m_lobby->add_to_desktop(*get_context().desktop);
 
             m_view = get_context().window->getView();
@@ -1116,9 +1117,10 @@ namespace rts
             sf::Sound *sound = new sf::Sound;
             sound->setBuffer(get_context().sound_holder->get(name));
             sound->setAttenuation(1.1);
-            sound->setMinDistance(128.0);
+            sound->setMinDistance(256.0);
 
             sound->setPosition(x, y, 0);
+            sound->setVolume(get_context().settings->sfx_volume);
             sound->play();
 
             for(unsigned int i = 0; i < m_sounds.size(); ++i) {

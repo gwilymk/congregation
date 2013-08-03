@@ -36,7 +36,10 @@ namespace rts
 
                 void play(const std::string &name, bool loop = true);
                 void stop();
-                bool is_playing();
+                bool is_playing() const;
+
+                float get_volume() const;
+                void set_volume(float new_volume);
             
             private:
                 sf::Music m_current_music;

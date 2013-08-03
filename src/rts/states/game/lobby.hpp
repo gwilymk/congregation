@@ -26,6 +26,7 @@
 #include <memory>
 
 #include "rts/network/server_info.hpp"
+#include "rts/states/state.hpp"
 
 namespace sfg
 {
@@ -44,7 +45,7 @@ namespace rts
                 struct ButtonCallback;
 
                 public:
-                    Lobby(bool *done);
+                    Lobby(bool *done, State::Context context);
                     ~Lobby();
 
                     void add_to_desktop(sfg::Desktop &desktop);
@@ -64,7 +65,8 @@ namespace rts
 
                     void set_server(int serverid);
 
-                    void quit();
+                    void music_volume_changed();
+                    void sfx_volume_changed();
 
                 private:
                     bool *m_done;
@@ -72,6 +74,8 @@ namespace rts
 
                     bool m_server;
                     int m_serverid;
+
+                    State::Context m_context;
             };
         }
     }

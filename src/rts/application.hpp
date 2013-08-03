@@ -22,6 +22,7 @@
 #include "rts/state_stack.hpp"
 #include "rts/holders/holder.hpp"
 #include "rts/holders/music_holder.hpp"
+#include "rts/settings.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/NonCopyable.hpp>
@@ -55,6 +56,7 @@ namespace rts
             holders::SoundHolder m_sound_holder;
             holders::MusicHolder m_music_holder;
             bool m_focused;
+            Settings m_settings;
             StateStack m_state_stack;
     };
 }

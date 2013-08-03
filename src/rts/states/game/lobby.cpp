@@ -18,6 +18,8 @@
 
 #include "lobby.hpp"
 #include "rts/common.hpp"
+#include "rts/holders/music_holder.hpp"
+#include "rts/settings.hpp"
 
 #include <SFGUI/SFGUI.hpp>
 #include <SFML/Network.hpp>
@@ -63,7 +65,9 @@ namespace rts
             static sfg::Box::Ptr create_labeled_item(const std::string &label, const sfg::Widget::Ptr &widget)
             {
                 sfg::Box::Ptr ret = sfg::Box::Create(sfg::Box::HORIZONTAL);
-                ret->Pack(sfg::Label::Create(label));
+                sfg::Label::Ptr label_widget = sfg::Label::Create(label);
+                label_widget->SetRequisition(sf::Vector2f(100, label_widget->GetRequisition().y));
+                ret->Pack(label_widget);
                 ret->Pack(widget);
                 return ret;
             }
@@ -78,6 +82,9 @@ namespace rts
 
                 sfg::Spinner::Ptr update_spinner;
                 sf::Time time_since_update;
+
+                sfg::Scale::Ptr music_volume_scale;
+                sfg::Scale::Ptr sfx_volume_scale;
 
                 sf::UdpSocket broadcast_socket;
                 sfg::Desktop *desktop;
@@ -103,11 +110,12 @@ namespace rts
                 int server;
             };
 
-            Lobby::Lobby(bool *done):
+            Lobby::Lobby(bool *done, State::Context context):
                 m_done(done),
                 m_impl(new Impl),
                 m_server(false),
-                m_serverid(-1)
+                m_serverid(-1),
+                m_context(context)
             {
                 *m_done = false;
                 m_impl->broadcast_socket.setBlocking(false);
@@ -160,6 +168,19 @@ namespace rts
                     m_impl->num_players->AppendItem(number_to_string(i));
 
                 notebook->AppendPage(vbox, sfg::Label::Create("Create Server"));
+
+                vbox = sfg::Box::Create(sfg::Box::VERTICAL);
+
+                m_impl->music_volume_scale = sfg::Scale::Create(0, 100, 5);
+                m_impl->music_volume_scale->SetValue(100);
+                m_impl->music_volume_scale->GetAdjustment()->GetSignal(sfg::Adjustment::OnChange).Connect(&Lobby::music_volume_changed, this);
+                vbox->Pack(create_labeled_item("Music Volume", m_impl->music_volume_scale), false, false);
+                m_impl->sfx_volume_scale = sfg::Scale::Create(0, 100, 5);
+                m_impl->sfx_volume_scale->SetValue(100);
+                m_impl->sfx_volume_scale->GetAdjustment()->GetSignal(sfg::Adjustment::OnChange).Connect(&Lobby::sfx_volume_changed, this);
+                vbox->Pack(create_labeled_item("Sound Effects Volume", m_impl->sfx_volume_scale), false, false);
+
+                notebook->AppendPage(vbox, sfg::Label::Create("Settings"));
 
                 m_impl->desktop = &desktop;
                 desktop.Add(m_impl->window);
@@ -282,6 +303,16 @@ namespace rts
             void Lobby::set_server(int serverid)
             {
                 m_serverid = serverid;
+            }
+
+            void Lobby::music_volume_changed()
+            {
+                m_context.music_holder->set_volume(m_impl->music_volume_scale->GetValue());
+            }
+
+            void Lobby::sfx_volume_changed()
+            {
+                m_context.settings->sfx_volume = m_impl->sfx_volume_scale->GetValue();
             }
         }
     }

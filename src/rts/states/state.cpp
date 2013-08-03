@@ -24,7 +24,7 @@ namespace rts
 {
     namespace states
     {
-        State::Context::Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder, holders::ShaderHolder &shader_holder, holders::SoundHolder &sound_holder, holders::MusicHolder &music_holder, sfg::Desktop &desktop, bool &focused):
+        State::Context::Context(sf::RenderWindow &window, holders::TextureHolder &texture_holder, holders::FontHolder &font_holder, holders::ShaderHolder &shader_holder, holders::SoundHolder &sound_holder, holders::MusicHolder &music_holder, sfg::Desktop &desktop, bool &focused, Settings &settings):
             window(&window),
             texture_holder(&texture_holder),
             font_holder(&font_holder),
@@ -32,7 +32,8 @@ namespace rts
             sound_holder(&sound_holder),
             music_holder(&music_holder),
             desktop(&desktop),
-            focused(&focused)
+            focused(&focused),
+            settings(&settings)
         {
         }
 

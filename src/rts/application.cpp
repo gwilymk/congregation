@@ -43,7 +43,8 @@ namespace rts
         m_sound_holder(),
         m_music_holder(),
         m_focused(true),
-        m_state_stack(states::State::Context(m_render_window, m_texture_holder, m_font_holder, m_shader_holder, m_sound_holder, m_music_holder, m_desktop, m_focused))
+        m_settings(),
+        m_state_stack(states::State::Context(m_render_window, m_texture_holder, m_font_holder, m_shader_holder, m_sound_holder, m_music_holder, m_desktop, m_focused, m_settings))
     {
         m_render_window.setVerticalSyncEnabled(true);
         m_render_window.resetGLStates();
