@@ -185,7 +185,7 @@ namespace rts
                 
                 if(m_direction % 2 == 1 && m_action == Action::WALKING && (m_frame == 2 || m_frame == 6))
                     for(int i = 0; i < 4; ++i)
-                        va[i].position -= sf::Vector2f(0, 1);
+                        va[i].position += sf::Vector2f(0, 1);
 
                 for(int i = 0; i < 4; ++i) {
                     va[i].color = sf::Color::White;
