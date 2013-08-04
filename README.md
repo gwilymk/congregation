@@ -65,3 +65,9 @@ Bugs
 ----
 
 Either fill a bug report in with the github issue tracker or send me an email.
+
+Download
+--------
+
+If you are unable or unwilling to compile the source code youself, you can binaries
+for windows and linux as [zip](http://goo.gl/vSzg9d) or as [tar.xz](http://goo.gl/sIozjI)
