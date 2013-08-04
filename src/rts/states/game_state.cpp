@@ -218,9 +218,9 @@ namespace rts
                 sf::RectangleShape rect;
                 rect.setPosition(m_select_start);
                 rect.setSize(m_select_end - m_select_start);
-                rect.setOutlineThickness(5);
-                rect.setOutlineColor(sf::Color::Black);
-                rect.setFillColor(sf::Color::Transparent);
+                rect.setOutlineThickness(2);
+                rect.setOutlineColor(m_player_colours[m_my_player]);
+                rect.setFillColor(m_player_colours[m_my_player] * sf::Color(255, 255, 255, 100));
                 get_context().window->draw(rect);
             }
 
