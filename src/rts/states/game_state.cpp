@@ -883,10 +883,17 @@ namespace rts
 
             if(!get_context().music_holder->is_playing()) {
                 if(num_fighting == 0) {
-                    get_context().music_holder->play("calm" + number_to_string(m_tile_random() % 3 + 1), false);
+                    int number = m_tile_random() % 3 + 1;
+                    if(number == prev_song) number = (number + 1) % 3 + 1;
+                    prev_song = number;
+                    get_context().music_holder->play("calm" + number_to_string(number), false);
                 } else if((float)num_fighting / (float)m_num_alive_minions < 0.5) {
-                    get_context().music_holder->play("tense" + number_to_string(m_tile_random() % 2 + 1), false);
+                    int number = m_tile_random() % 2 + 1 + 3;
+                    if(number == prev_song) number = (number + 1) % 2 + 1 + 3;
+                    prev_song = number;
+                    get_context().music_holder->play("tense" + number_to_string(number - 3), false);
                 } else {
+                    prev_song = 6;
                     get_context().music_holder->play("war", false);
                 }
             }

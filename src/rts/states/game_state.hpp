@@ -145,6 +145,7 @@ namespace rts
                 std::vector<std::unique_ptr<sf::Sound>> m_sounds;
                 int m_time_since_last_play_sound = 10000;
                 sf::Uint16 m_num_alive_minions = 0;
+                int prev_song = 1;
         };
     }
 }
